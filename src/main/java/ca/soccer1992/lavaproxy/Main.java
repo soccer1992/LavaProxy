@@ -21,6 +21,7 @@ public class Main {
         //root.put(new StringTag("name","hello"));
         //System.out.println(root.);
         //NBTWriter.write(root, new FileOutputStream("world.dat"), false, true); // true = gzip
+
         new NettyServer(25577).start();
 
     }
