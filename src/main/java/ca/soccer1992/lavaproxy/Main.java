@@ -14,7 +14,7 @@ public class Main {
     public static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static final AttributeKey<Connection> READER =
             AttributeKey.valueOf("connection");
-    public static boolean logErrors = false;
+    public static boolean logErrors = true;
     public static void main(String[] args) throws Exception {
         //System.out.println(root.value.values());
         //root = new CompoundTag("root");

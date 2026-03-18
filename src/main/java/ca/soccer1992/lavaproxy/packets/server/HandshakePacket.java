@@ -1,4 +1,5 @@
 package ca.soccer1992.lavaproxy.packets.server;
+import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.HandshakeIntent;
 import ca.soccer1992.lavaproxy.packets.Packet;
@@ -10,12 +11,15 @@ public class HandshakePacket extends Packet {
     public HandshakeIntent intent;
     public int port;
     public String host;
-    public int proto;
+    public MinecraftVersions proto;
     public ConnectionTypes getType() { return ConnectionTypes.HANDSHAKE; }
     public String name = "Handshake";
 
     public void setPort(int port){this.port = port;}
-    public void setProtocol(int proto){this.proto = proto;}
+    public void setProtocol(MinecraftVersions proto){
+        this.proto = proto;
+    }
+    public void setProtocol(int proto){setProtocol(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(proto));}
     public void setIntent(HandshakeIntent intent){this.intent = intent;}
     public void setHost(String host){this.host = host;}
     public void decode (ByteBuf buf){
@@ -27,7 +31,7 @@ public class HandshakePacket extends Packet {
         setIntent(HandshakeIntent.getIntentFromID(readVarInt(buf)));
     }
     public void encode(ByteBuf buf){
-        writeVarInt(this.proto, buf);
+        writeVarInt(this.proto.getProtocol(), buf);
         writeString(this.host, buf);
         buf.writeShort(this.port);
         writeVarInt(this.intent.getId(), buf);

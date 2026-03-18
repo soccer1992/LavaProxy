@@ -19,7 +19,7 @@ import java.net.SocketAddress;
 
 public class Connection {
     public final Channel nChannel;
-    public int protocol;
+    public MinecraftVersions protocol;
     public InetSocketAddress connectAddr;
 
     public InetSocketAddress addr;
@@ -45,15 +45,19 @@ public class Connection {
     public void setReader(Reader r){
         this.protoReader = r;
     }
-    public void setProtocol(int proto){
+    public void setProtocol(MinecraftVersions proto){
         this.protocol = proto;
+    }
+
+    public void setProtocol(int proto){
+        setProtocol(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(proto));
     }
     public void addToHeld(ByteBuf buf){
         heldData.writeBytes(buf);
     }
 
     public Packet processPacket(ByteBuf p) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        return protoReader.read(p, protocol);
+        return protoReader.read(p, protocol.getProtocol());
     }
     public void writePacket(Packet p){
         ByteBuf buf = Unpooled.buffer();

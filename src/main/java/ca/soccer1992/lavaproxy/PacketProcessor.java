@@ -5,6 +5,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.nio.charset.StandardCharsets;
+
 public class PacketProcessor extends ChannelDuplexHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -23,6 +25,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
 
         try {
             while (read != null) {
+                System.out.println(read.toString(StandardCharsets.UTF_8));
                 Packet p = con.processPacket(read);
                 if (p == null) {
                     // invalid packet
@@ -35,6 +38,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
 
             }
         } catch (Exception e){
+            e.printStackTrace();
             con.disconnect(e.toString(), true);
         } finally{
             in.release();

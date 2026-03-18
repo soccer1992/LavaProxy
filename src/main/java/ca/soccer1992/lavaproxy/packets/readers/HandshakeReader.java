@@ -1,5 +1,6 @@
 package ca.soccer1992.lavaproxy.packets.readers;
 
+import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.DefinitionPair;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.server.HandshakePacket;
@@ -13,7 +14,7 @@ import static ca.soccer1992.lavaproxy.PacketHelpers.*;
 public class HandshakeReader extends Reader {
     public Map<Class<? extends Packet>, List<DefinitionPair>> serverDefinitions = Map.of(
             HandshakePacket.class, List.of(
-                    new DefinitionPair(47, 0x00)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_8, 0x00)
             )
     );
     @Override

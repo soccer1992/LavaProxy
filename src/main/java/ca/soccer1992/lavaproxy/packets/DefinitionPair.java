@@ -1,3 +1,5 @@
 package ca.soccer1992.lavaproxy.packets;
 
-public record DefinitionPair(int protocol, int packetID) {}
+import ca.soccer1992.lavaproxy.MinecraftVersions;
+
+public record DefinitionPair(MinecraftVersions protocol, int packetID) {}
