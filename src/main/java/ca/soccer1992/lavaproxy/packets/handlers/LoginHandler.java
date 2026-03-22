@@ -1,17 +1,10 @@
 package ca.soccer1992.lavaproxy.packets.handlers;
 
 import ca.soccer1992.lavaproxy.Connection;
-import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
-import ca.soccer1992.lavaproxy.packets.HandshakeIntent;
 import ca.soccer1992.lavaproxy.packets.Packet;
-import ca.soccer1992.lavaproxy.packets.client.CompressionPacket;
-import ca.soccer1992.lavaproxy.packets.client.LoginKick;
-import ca.soccer1992.lavaproxy.packets.readers.LoginReader;
-import ca.soccer1992.lavaproxy.packets.server.HandshakePacket;
 import ca.soccer1992.lavaproxy.packets.server.LoginStart;
 import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 
-import static ca.soccer1992.lavaproxy.utils.ComponentUtils.json;
 
 public class LoginHandler extends Handler{
     public boolean handle(Packet p, Connection c){

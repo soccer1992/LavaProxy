@@ -6,8 +6,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 public class PacketHelpers {
     private static final int SEGMENT_BITS = 0x7F;
@@ -82,45 +82,60 @@ public class PacketHelpers {
         ByteBuf clone = buf.copy();
         return readFunc.apply(clone);
     }
-    public static byte[] compress(byte[] raw) {
-        try{
-        // Use try-with-resources to ensure streams are closed automatically
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(raw.length);
-             GZIPOutputStream gzipOutput = new GZIPOutputStream(bos)) {
-            gzipOutput.write(raw);
-            // GZIPOutputStream must be closed to write all trailer information
-            gzipOutput.close();
+    public static byte[] compress(byte[] data) {
+        try {
+            Deflater deflater = new Deflater();
+            deflater.setInput(data);
+            deflater.finish();
+
+            byte[] buffer = new byte[data.length];
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+            while (!deflater.finished()) {
+                int count = deflater.deflate(buffer);
+                bos.write(buffer, 0, count);
+            }
+
+            deflater.end();
             return bos.toByteArray();
-        }} catch (Exception e){
+
+        } catch (Exception e) {
             return null;
         }
     }
-    public static byte[] decompress(final byte[] compressed) throws IOException {
-        if (compressed == null || compressed.length == 0) {
-            return new byte[0];
-        }
 
-        // Use try-with-resources to ensure streams are closed automatically
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(compressed);
-             GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
-             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+    public static byte[] decompress(byte[] compressed, int expectedSize) {
+        try {
+            Inflater inflater = new Inflater();
+            inflater.setInput(compressed);
 
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(expectedSize > 0 ? expectedSize : compressed.length);
             byte[] buffer = new byte[1024];
-            int len;
-            // Read from the GZIP stream and write to the output stream
-            while ((len = gzipInputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, len);
+
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+
+                if (count == 0) {
+                    if (inflater.needsInput() || inflater.needsDictionary()) {
+                        break;
+                    }
+                }
+
+                bos.write(buffer, 0, count);
             }
 
-            return byteArrayOutputStream.toByteArray();
+            inflater.end();
+            return bos.toByteArray();
+
+        } catch (Exception e) {
+            return null;
         }
     }
     public static String readString(ByteBuf buf){
         int len = readVarInt(buf);
         //System.out.println(len);
         try {
-            String thing = (String) buf.readCharSequence(len, StandardCharsets.UTF_8);
-            return thing;
+            return (String) buf.readCharSequence(len, StandardCharsets.UTF_8);
 
         } catch (Exception e){
             return "";

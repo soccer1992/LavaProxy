@@ -31,7 +31,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
 
                         byte[] tmp = new byte[read.readableBytes()];
                         read.readBytes(tmp);
-                        byte[] decompressed = decompress(tmp);
+                        byte[] decompressed = decompress(tmp, compLength);
                         read = Unpooled.buffer();
                         read.writeBytes(decompressed);
                     }

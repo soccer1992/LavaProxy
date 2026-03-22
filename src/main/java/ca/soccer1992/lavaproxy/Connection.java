@@ -2,6 +2,7 @@ package ca.soccer1992.lavaproxy;
 
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
+import ca.soccer1992.lavaproxy.packets.client.CompressionPacket;
 import ca.soccer1992.lavaproxy.packets.client.LoginKick;
 import ca.soccer1992.lavaproxy.packets.handlers.*;
 import ca.soccer1992.lavaproxy.packets.readers.*;
@@ -75,6 +76,12 @@ public class Connection {
         _writePacket(p, buf);
 
     }
+    public void sendCompression(int threshold){
+        CompressionPacket pac = new CompressionPacket();
+        pac.threshold = threshold;
+        writePacket(pac);
+        setCompression(threshold);
+    }
     public void _writePacket(Packet p, ByteBuf buf){
         p.encode(buf, protocol);
         ByteBuf compressedRewritten = Unpooled.buffer();
@@ -101,7 +108,7 @@ public class Connection {
             }
 
         } else        compressedRewritten.writeBytes(buf, 0, buf.readableBytes());
-
+        //System.out.println(compressedRewritten.toString(StandardCharsets.UTF_8));
 
         ByteBuf rewritten14 = Unpooled.buffer();
         writeVarInt(compressedRewritten.readableBytes(), rewritten14);
