@@ -23,6 +23,24 @@ public class LoginStart extends Packet {
 
         setName(readString(buf));
         setUUID(UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8)));
+
+        // debug do not leave in prod bro do not do this
+        if (false){ // set to false to disable future me
+            if (proto.getProtocol()<=MinecraftVersions.MINECRAFT_1_19.getProtocol()){
+                return;
+            }
+            if (proto.getProtocol()<MinecraftVersions.MINECRAFT_1_19_3.getProtocol()){
+                buf.readBoolean(); // no sig
+            }
+            if (proto.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
+                buf.readBoolean(); // has UUID
+            }
+
+            setUUID(readUUID(buf));
+
+
+
+        }
         //setUUID(readUUID(buf));
     }
     public void encode(ByteBuf buf, MinecraftVersions proto){
@@ -44,9 +62,8 @@ public class LoginStart extends Packet {
             buf.writeBoolean(true); // has UUID
         }
 
-        if (proto.getProtocol()>=MinecraftVersions.MINECRAFT_1_19_1.getProtocol()){
-            writeUUID(uuid,buf);
-        }
+        writeUUID(uuid,buf);
+
     }
 
 }

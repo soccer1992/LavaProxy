@@ -19,7 +19,11 @@ public abstract class Reader {
     public static Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of();
     public Packet read(ByteBuf buf, int ver) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         int id = readVarInt(buf);
-        Packet p = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id).getDeclaredConstructor().newInstance();
+        Class<? extends Packet> clazz = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
+        if (clazz == null){
+            return null;
+        }
+        Packet p = clazz.getDeclaredConstructor().newInstance();
 
         p.decode(buf, MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver));
         return p;
@@ -70,6 +74,9 @@ public abstract class Reader {
                 oldEntry = pair;
 
             }
+        }
+        if (correct == null){
+            return null; // to prevent a error
         }
         return correct.getKey();
     }

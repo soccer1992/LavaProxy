@@ -2,14 +2,12 @@ package ca.soccer1992.lavaproxy;
 
 import io.netty.buffer.ByteBuf;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.zip.GZIPInputStream;
 
 public class PacketHelpers {
     private static final int SEGMENT_BITS = 0x7F;
@@ -83,6 +81,26 @@ public class PacketHelpers {
     public static Object readWithoutEat(Function<ByteBuf,Object> readFunc, ByteBuf buf){
         ByteBuf clone = buf.copy();
         return readFunc.apply(clone);
+    }
+    public static byte[] decompress(final byte[] compressedBytes) throws IOException {
+        if (compressedBytes == null || compressedBytes.length == 0) {
+            return new byte[0];
+        }
+
+        // Use try-with-resources to ensure streams are closed automatically
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(compressedBytes);
+             GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+
+            byte[] buffer = new byte[1024];
+            int len;
+            // Read from the GZIP stream and write to the output stream
+            while ((len = gzipInputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, len);
+            }
+
+            return byteArrayOutputStream.toByteArray();
+        }
     }
     public static String readString(ByteBuf buf){
         int len = readVarInt(buf);

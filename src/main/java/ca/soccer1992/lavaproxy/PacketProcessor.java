@@ -2,10 +2,11 @@ package ca.soccer1992.lavaproxy;
 
 import ca.soccer1992.lavaproxy.packets.Packet;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
-
+import static ca.soccer1992.lavaproxy.PacketHelpers.*;
 public class PacketProcessor extends ChannelDuplexHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -20,9 +21,22 @@ public class PacketProcessor extends ChannelDuplexHandler {
         Connection con = ctx.channel().attr(Main.READER).get();
         con.addToHeld(in);
         ByteBuf read = con.readPacket();
-
         try {
             while (read != null) {
+                if (con.compressionAmount>-1){
+                    // check first varInt (0 = uncompressed, anything else = compressed length)
+                    int compLength = readVarInt(read);
+                    if (compLength>0){
+
+                        byte[] decompressed = new byte[compLength];
+                        byte[] tmp = new byte[read.readableBytes()];
+                        read.readBytes(tmp);
+                        decompressed = decompress(tmp);
+                        read = Unpooled.buffer();
+                        read.writeBytes(decompressed);
+                    }
+
+                }
                 //System.out.println(read.toString(StandardCharsets.UTF_8));
                 Packet p = con.processPacket(read);
                 if (p == null) {

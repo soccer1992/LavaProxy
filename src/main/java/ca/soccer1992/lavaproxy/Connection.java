@@ -20,18 +20,22 @@ public class Connection {
     public final Channel nChannel;
     public MinecraftVersions protocol;
     public InetSocketAddress connectAddr;
-
+    public int compressionAmount;
     public InetSocketAddress addr;
     public Reader protoReader;
     public Handler packetHandler;
     public Player plr;
     public ConnectionTypes conType = ConnectionTypes.HANDSHAKE;
     public ByteBuf heldData = Unpooled.buffer();
+    public void setCompression(int amt){
+        this.compressionAmount = amt;
+    }
     // to make a lot of random junk very easier
     public Connection(Channel c){
         this.nChannel = c;
         this.addr = (InetSocketAddress) c.remoteAddress();
         setProtocol(47);
+        setCompression(-1);
         setReader(new HandshakeReader());
         setHandler(new HandshakeHandler());
 
@@ -90,18 +94,21 @@ public class Connection {
         _disconnect(reason, true);
     }
     public void _disconnect(String reason, boolean nolog){
-
-        switch (conType){
-            case ConnectionTypes.HANDSHAKE, ConnectionTypes.PRE_STATUS, ConnectionTypes.STATUS:
-                // just close the connection
-                close();
-                // generic close
-                break;
-            case ConnectionTypes.LOGIN:
-                LoginKick kick = new LoginKick();
-                kick.setReason(reason);
-                writePacket(kick);
-                close();
+        try {
+            switch (conType) {
+                case ConnectionTypes.HANDSHAKE, ConnectionTypes.PRE_STATUS, ConnectionTypes.STATUS:
+                    // just close the connection
+                    close();
+                    // generic close
+                    break;
+                case ConnectionTypes.LOGIN:
+                    LoginKick kick = new LoginKick();
+                    kick.setReason(reason);
+                    writePacket(kick);
+                    close();
+            }
+        } catch (Exception e){
+            close();
         }
         if (nolog) return;
         System.out.printf("%s has disconnected for: %s%n",plr,reason);
