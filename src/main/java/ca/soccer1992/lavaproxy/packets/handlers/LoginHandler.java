@@ -27,8 +27,6 @@ public class LoginHandler extends Handler{
             c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing</rainbow>"),false);
             return true;
 
-        } else if (p instanceof final CompressionPacket packet) {
-            c.setCompression(packet.threshold);
         }
 
 
