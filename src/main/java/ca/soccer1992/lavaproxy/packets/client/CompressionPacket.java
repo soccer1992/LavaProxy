@@ -7,7 +7,6 @@ import ca.soccer1992.lavaproxy.utils.PacketHelpers;
 import io.netty.buffer.ByteBuf;
 
 public class CompressionPacket extends Packet {
-
     public ConnectionTypes getType() { return ConnectionTypes.LOGIN; }
 
     public String name = "CompressionPacket";

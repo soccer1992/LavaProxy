@@ -15,6 +15,7 @@ import static ca.soccer1992.lavaproxy.utils.ComponentUtils.json;
 
 public class LoginHandler extends Handler{
     public boolean handle(Packet p, Connection c){
+
         if (p instanceof LoginStart packet){
             if (!packet.playerName.matches("[a-zA-Z0-9\\p{Punct}]+")){
                 c.noLogDisconnect("\"Invalid player name\"");
