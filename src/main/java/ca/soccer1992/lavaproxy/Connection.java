@@ -75,10 +75,24 @@ public class Connection {
     }
     public void _writePacket(Packet p, ByteBuf buf){
         p.encode(buf, protocol);
+        ByteBuf compressedRewritten = Unpooled.buffer();
+
+        if (compressionAmount>=0){
+
+            if (buf.readableBytes()>=compressionAmount){
+                writeVarInt(buf.readableBytes(), compressedRewritten);
+            } else {
+                writeVarInt(0, compressedRewritten);
+            }
+
+        }
+        compressedRewritten.writeBytes(buf, 0, buf.readableBytes());
+
         ByteBuf rewritten14 = Unpooled.buffer();
-        writeVarInt(buf.readableBytes(), rewritten14);
-        rewritten14.writeBytes(buf, 0, buf.readableBytes());
+        writeVarInt(compressedRewritten.readableBytes(), rewritten14);
+        rewritten14.writeBytes(compressedRewritten, 0, compressedRewritten.readableBytes());
         buf.release();
+        compressedRewritten.release();
         nChannel.writeAndFlush(rewritten14);
 
     }
