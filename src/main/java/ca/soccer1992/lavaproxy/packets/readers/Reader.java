@@ -14,7 +14,7 @@ import static ca.soccer1992.lavaproxy.utils.PacketHelpers.readVarInt;
 public abstract class Reader {
     protected abstract Map<Class<? extends Packet>, List<DefinitionPair>> serverDefinitions();
     protected abstract Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions();
-
+    public Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of();
     public Packet read(ByteBuf buf, int ver) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         int id = readVarInt(buf);
         Class<? extends Packet> clazz = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
