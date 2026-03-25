@@ -25,10 +25,15 @@ public class LoginHandler extends Handler{
             LoginSuccess success = new LoginSuccess();
             success.setName(c.plr.name);
             success.setUUID(c.plr.uuid);
+            if (c.protocol.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
+                c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing (<1.20.2 LOGIN KICK)</rainbow>"),false);
+                return true;
+            }
             c.writePacket(success);
             if (c.protocol.getProtocol()< MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
                 // instantly change it xd
                 c.conType = ConnectionTypes.PLAY;
+                return true;
 
             } else {
                 c.conType = ConnectionTypes.POST_SUCCESS;
@@ -43,10 +48,11 @@ public class LoginHandler extends Handler{
                 return true;
             }
 
-            c.conType = ConnectionTypes.CONFIG;
-            c.setReader(new ConfigReader());
-            c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing</rainbow>"),false);
 
+            c.setReader(new ConfigReader());
+            c.conType = ConnectionTypes.CONFIG;
+
+            c.setHandler(new ConfigHandler());
             return true;
         }
 

@@ -12,11 +12,9 @@ import java.util.Map;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.readVarInt;
 
 public abstract class Reader {
-    public static Map<Class<? extends Packet>, List<DefinitionPair>> serverDefinitions = Map.of();
     protected abstract Map<Class<? extends Packet>, List<DefinitionPair>> serverDefinitions();
     protected abstract Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions();
 
-    public static Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of();
     public Packet read(ByteBuf buf, int ver) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         int id = readVarInt(buf);
         Class<? extends Packet> clazz = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
@@ -49,7 +47,7 @@ public abstract class Reader {
         for (DefinitionPair pair : definitions.get(packet)){
             if (oldEntry != null){
                 if (pair.protocol().getProtocol()>ver){
-                    return pair.packetID();
+                    return oldEntry.packetID();
                 }
             }
             correct = pair.packetID();
@@ -66,7 +64,7 @@ public abstract class Reader {
                 if (pair.packetID() != packetID) continue;
                 if (oldEntry != null){
                     if (pair.protocol().getProtocol()>ver){
-                        return e.getKey();
+                        return correct.getKey();
                     }
                 }
                 correct = e;

@@ -39,13 +39,13 @@ public class PacketProcessor extends ChannelDuplexHandler {
                 }
                 //System.out.println(read.toString(StandardCharsets.UTF_8));
                 Packet p = con.processPacket(read);
+                read.release();
                 if (p == null) {
                     // invalid packet
                     ctx.close();
                     return;
                 }
                 ctx.fireChannelRead(p);
-                read.release();
                 read = con.readPacket();
 
             }

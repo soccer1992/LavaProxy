@@ -124,7 +124,7 @@ public class Connection {
         disconnect(Component.text(reason), isError);
     }
     public void noLogDisconnect(String reason){
-        _disconnect(Component.text(reason), true);
+        noLogDisconnect(Component.text(reason));
     }
     public void disconnect(){
         disconnect(Component.text("Disconnected"), false);

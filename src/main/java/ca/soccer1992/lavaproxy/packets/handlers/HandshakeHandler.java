@@ -18,10 +18,6 @@ public class HandshakeHandler extends Handler{
         if (packet.intent == null){
             return false;
         }
-        if (packet.intent== HandshakeIntent.TRANSFER){
-            // just ignore it bro
-            return false;
-        }
         c.connectAddr = new InetSocketAddress(packet.host, packet.port);
         c.setProtocol(packet.proto);
 
@@ -30,8 +26,8 @@ public class HandshakeHandler extends Handler{
                 c.setReader(new PreStatusReader());
                 c.setHandler(new PreStatusHandler());
                 c.conType = ConnectionTypes.PRE_STATUS;
-                return true; // unimplemented
-            case HandshakeIntent.LOGIN:
+                return true;
+            case HandshakeIntent.LOGIN, HandshakeIntent.TRANSFER:
                 c.setReader(new LoginReader());
                 c.conType = ConnectionTypes.LOGIN;
                 c.setHandler(new LoginHandler());

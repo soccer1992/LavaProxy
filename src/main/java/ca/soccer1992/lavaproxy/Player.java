@@ -6,8 +6,13 @@ public class Player {
     public Connection con;
     public String name = null;
     public UUID uuid = null;
+    public String brand = null;
     public void setUUID(UUID uuid){
         this.uuid = uuid;
+
+    }
+    public void setBrand(String brand){
+        this.brand = brand;
 
     }
     public void setName(String name){
