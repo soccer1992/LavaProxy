@@ -15,7 +15,7 @@ public class PreStatusHandler extends Handler{
             c.writePacketServer(packet);
             return true;
         }
-        if (p instanceof StatusRequest packet){
+        if (p instanceof StatusRequest){
             StatusResponse response = new StatusResponse();
             CompoundTag info = new CompoundTag("");
             CompoundTag ver = new CompoundTag("version");
@@ -34,7 +34,8 @@ public class PreStatusHandler extends Handler{
             } catch (Exception e){
                 c.close();
             }
-            if (Main.logPings) System.out.printf("%s has pinged%n",c.plr);
+            if (Main.logPings) System.out.println(c.fillPlaceholders(Main.translations.get("log.ping"), "", ""));
+
             c.conType = ConnectionTypes.STATUS;
             c.setReader(new StatusReader());
             c.setHandler(new StatusHandler());
