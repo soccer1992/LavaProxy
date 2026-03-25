@@ -27,7 +27,7 @@ public class NettyServer {
                         protected void initChannel(SocketChannel ch) {
                             Main.CON_AMOUNT += 1;
                             ch.attr(Main.READER).set(new Connection(ch));
-                            ch.pipeline().addFirst(new PacketProcessor());
+                            ch.pipeline().addFirst(new PacketProcessor(false));
 
                             ch.pipeline().addLast(new ServerHandler());
                         }

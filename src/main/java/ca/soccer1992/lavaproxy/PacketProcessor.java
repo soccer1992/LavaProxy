@@ -7,12 +7,18 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import net.kyori.adventure.text.Component;
 
+
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 public class PacketProcessor extends ChannelDuplexHandler {
+    public boolean client;
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Connection con = ctx.channel().attr(Main.READER).get();
         con.disconnect(Component.text(cause.toString()), true);
+    }
+    public PacketProcessor(boolean client){
+        this.client = client;
     }
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg){
@@ -38,7 +44,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
 
                 }
                 //System.out.println(read.toString(StandardCharsets.UTF_8));
-                Packet p = con.processPacket(read);
+                Packet p = con.processPacket(read,client);
                 read.release();
                 if (p == null) {
                     // invalid packet

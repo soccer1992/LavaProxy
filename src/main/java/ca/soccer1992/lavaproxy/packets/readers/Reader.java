@@ -15,12 +15,20 @@ public abstract class Reader {
     protected abstract Map<Class<? extends Packet>, List<DefinitionPair>> serverDefinitions();
     protected abstract Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions();
     public Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of();
-    public Packet read(ByteBuf buf, int ver) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public Packet read(ByteBuf buf, int ver, boolean forceClient) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         int id = readVarInt(buf);
-        Class<? extends Packet> clazz = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
+        Class<? extends Packet> clazz;
+        //System.out.printf("Attempting to read ID %s from protocol %s as %s (IsClient: %s)%n",id,ver,this.getClass(),forceClient);
+        if (!forceClient) {
+            clazz = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
+        } else {
+            clazz = getPacketFromInfoClient(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
+
+        }
         if (clazz == null){
             return null;
         }
+
         Packet p = clazz.getDeclaredConstructor().newInstance();
 
         p.decode(buf, MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver));

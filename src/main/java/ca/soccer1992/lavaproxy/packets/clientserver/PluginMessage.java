@@ -1,4 +1,4 @@
-package ca.soccer1992.lavaproxy.packets.client;
+package ca.soccer1992.lavaproxy.packets.clientserver;
 
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 

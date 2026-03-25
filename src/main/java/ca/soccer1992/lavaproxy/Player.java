@@ -1,14 +1,21 @@
 package ca.soccer1992.lavaproxy;
 
+import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
+
 import java.util.UUID;
 
 public class Player {
     public Connection con;
     public String name = null;
     public UUID uuid = null;
-    public String brand = null;
+    public String brand = "";
+    public ClientInfo infoPacket = null;
     public void setUUID(UUID uuid){
         this.uuid = uuid;
+
+    }
+    public void setInfo(ClientInfo info){
+        this.infoPacket = info;
 
     }
     public void setBrand(String brand){

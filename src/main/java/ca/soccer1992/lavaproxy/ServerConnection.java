@@ -1,21 +1,22 @@
 package ca.soccer1992.lavaproxy;
 
+import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.HandshakeIntent;
+import ca.soccer1992.lavaproxy.packets.handlers.client.LoginHandler;
+import ca.soccer1992.lavaproxy.packets.readers.HandshakeReader;
+import ca.soccer1992.lavaproxy.packets.readers.LoginReader;
 import ca.soccer1992.lavaproxy.packets.server.*;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-import java.util.UUID;
-
 public class ServerConnection {
-    public void connect(Connection con, HandshakeIntent intent, String host, int port) throws InterruptedException {
+    public Connection connect(Connection con, HandshakeIntent intent, String host, int port) {
 
         EventLoopGroup group = new NioEventLoopGroup();
-
+        final Connection[] throughConnection = {null};
         try {
             Bootstrap bootstrap = new Bootstrap();
 
@@ -24,37 +25,48 @@ public class ServerConnection {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() {
+                            Connection c = new Connection(ch);
+                            ch.attr(Main.READER).set(c);
+                            throughConnection[0] = c;
+                            ch.attr(Main.BACKEND).set(con);
+                            ch.pipeline().addFirst(new PacketProcessor(true));
+
+                            ch.pipeline().addLast(new ServerHandler());
+                            ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+
 
                                 @Override
                                 public void channelActive(ChannelHandlerContext ctx) {
                                     //
-                                    Connection c = new Connection(ctx.channel());
-                                    ctx.channel().attr(Main.READER).set(c);
                                     HandshakePacket p = new HandshakePacket();
                                     p.setIntent(intent);
                                     p.setProtocol(con.protocol);
                                     p.setHost(con.connectAddr.getHostString());
                                     p.setPort(con.connectAddr.getPort());
+                                    c.setReader(new HandshakeReader());
                                     c.writePacketServer(p);
+                                    c.setProtocol(con.protocol);
                                     if (intent.getId()>1) {
                                         LoginStart login = new LoginStart();
                                         login.setName(con.plr.name);
                                         login.setUUID(con.plr.uuid);
+                                        c.plr.uuid = con.plr.uuid;
+                                        c.plr.name = con.plr.name;
+                                        c.plr.brand = con.plr.brand;
+                                        c.backendConnection = con;
+                                        c.setReader(new LoginReader());
+                                        c.conType = ConnectionTypes.LOGIN;
+                                        c.setHandler(new LoginHandler());
                                         c.writePacketServer(login);
+
                                     }
-                                }
-
-                                @Override
-                                protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
-                                    byte[] bytes = new byte[msg.readableBytes()];
-                                    msg.readBytes(bytes);
 
                                 }
+
 
                                 @Override
                                 public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-                                    cause.printStackTrace();
+
                                     ctx.close();
                                 }
                             });
@@ -64,8 +76,11 @@ public class ServerConnection {
             ChannelFuture future = bootstrap.connect(host, port).sync();
             future.channel().closeFuture().sync();
 
+        } catch (Exception e){
+            con.backendDisconnect(e.toString());
         } finally {
             group.shutdownGracefully();
         }
+        return throughConnection[0];
     }
 }

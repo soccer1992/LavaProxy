@@ -5,13 +5,28 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.json.*;
 
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class ComponentUtils {
     public static MiniMessage parser = MiniMessage.miniMessage();
     public static String json(Component comp) {
         return JSONComponentSerializer.json().serialize(comp);
+    }
+    public static String plain(Component comp){
+        return PlainTextComponentSerializer.plainText().serialize(comp);
+    }
+    public static Component fromJSON(String json){
+        return JSONComponentSerializer.json().deserialize(json);
+    }
+    public static String miniMessage(Component comp){
+        return parser.serialize(comp);
+    }
+    public static Component fromNBT(CompoundTag tag) throws IOException {
+        return fromJSON(tag.getJSON().toString());
     }
     public static CompoundTag nbt(Component comp){
         String json = json(comp);
