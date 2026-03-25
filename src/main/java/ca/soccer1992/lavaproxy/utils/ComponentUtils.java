@@ -14,7 +14,15 @@ public class ComponentUtils {
         return JSONComponentSerializer.json().serialize(comp);
     }
     public static CompoundTag nbt(Component comp){
-        return parse("", new JSONObject(json(comp)));
+        String json = json(comp);
+        JSONObject out = new JSONObject();
+        if (json.startsWith("{")){
+            out = new JSONObject(json);
+        } else if (json.startsWith("[")){
+            out.put("extra",new JSONArray(json));
+            out.put("text","");
+        }
+        return parse("", out);
     }
     public static CompoundTag parse(String name, JSONObject obj) {
         CompoundTag compound = new CompoundTag(name);
