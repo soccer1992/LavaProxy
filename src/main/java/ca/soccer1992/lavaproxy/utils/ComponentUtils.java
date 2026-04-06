@@ -1,16 +1,17 @@
 package ca.soccer1992.lavaproxy.utils;
 
-import ca.soccer1992.lavaproxy.nbt.*;
+
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.json.*;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import net.querz.nbt.tag.ListTag;
+import net.querz.nbt.tag.StringTag;
 
-import java.io.IOException;
-
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.io.SNBTUtil;
 public class ComponentUtils {
     public static MiniMessage parser = MiniMessage.miniMessage();
     public static String json(Component comp) {
@@ -25,96 +26,49 @@ public class ComponentUtils {
     public static String miniMessage(Component comp){
         return parser.serialize(comp);
     }
-    public static Component fromNBT(CompoundTag tag) throws IOException {
-        return fromJSON(tag.getJSON().toString());
+    public static Component fromNBT(CompoundTag tag) {
+        return fromJSON(tag.toString());
     }
     public static CompoundTag nbt(Component comp){
         String json = json(comp);
-        JSONObject out = new JSONObject();
+        //CompoundTag out = new CompoundTag("");
+        //Nbt NBT = new Nbt();
         if (json.startsWith("{")){
-            out = new JSONObject(json);
+            try {
+                CompoundTag parsed = (CompoundTag) SNBTUtil.fromSNBT(json);
+                return parsed;
+            } catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }
         } else if (json.startsWith("[")){
-            out.put("extra",new JSONArray(json));
-            out.put("text","");
+
+            try {
+                ListTag parsed = (ListTag) SNBTUtil.fromSNBT(json);
+                CompoundTag out = new CompoundTag();
+                out.put("extra",parsed);
+                out.putString("text","");
+                return out;
+            } catch (Exception e){
+                return null;
+            }
+
+        } else if ((json.startsWith("\"") && json.endsWith("\"")) || (json.startsWith("'") && json.endsWith("'"))){
+            try {
+                StringTag parsed = (StringTag) SNBTUtil.fromSNBT(json);
+                CompoundTag out = new CompoundTag();
+                out.put("text",parsed);
+                return out;
+            } catch (Exception e){
+                return null;
+            }
+
         } else {
-            out.put("text",plain(comp));
-        }
-        return parse("", out);
-    }
-    public static CompoundTag parse(String name, JSONObject obj) {
-        CompoundTag compound = new CompoundTag(name);
+            CompoundTag out = new CompoundTag();
+            out.putString("text",json);
+            return out;
 
-        for (String key : obj.keySet()) {
-            Object value = obj.get(key);
-            compound.put(parseValue(key, value));
         }
-
-        return compound;
     }
 
-    private static Tag parseValue(String name, Object value) {
-
-        if (value instanceof JSONObject jsonObj) {
-            return parse(name, jsonObj);
-        }
-
-        if (value instanceof JSONArray jsonArr) {
-            return parseList(name, jsonArr);
-        }
-
-        if (value instanceof String str) {
-            return new StringTag(name, str);
-        }
-
-        if (value instanceof Integer i) {
-            return new IntTag(name, i);
-        }
-
-        if (value instanceof Long l) {
-            return new LongTag(name, l);
-        }
-
-        if (value instanceof Double d) {
-            return new DoubleTag(name, d);
-        }
-
-        if (value instanceof Float f) {
-            return new FloatTag(name, f);
-        }
-
-        if (value instanceof Boolean b) {
-            return new ByteTag(name, (byte) (b ? 1 : 0));
-        }
-
-        throw new IllegalArgumentException("Unsupported type: " + value.getClass());
-    }
-    private static ListTag parseList(String name, JSONArray arr) {
-        if (arr.isEmpty()) {
-            return new ListTag(name, TagType.END); // or handle empty case differently
-        }
-
-        Object first = arr.get(0);
-        TagType type = getTagType(first);
-
-        ListTag list = new ListTag(name, type);
-
-        for (int i = 0; i < arr.length(); i++) {
-            Object val = arr.get(i);
-            list.add(parseValue("", val)); // lists have unnamed elements
-        }
-
-        return list;
-    }
-    private static TagType getTagType(Object value) {
-        if (value instanceof JSONObject) return TagType.COMPOUND;
-        if (value instanceof JSONArray) return TagType.LIST;
-        if (value instanceof String) return TagType.STRING;
-        if (value instanceof Integer) return TagType.INT;
-        if (value instanceof Long) return TagType.LONG;
-        if (value instanceof Double) return TagType.DOUBLE;
-        if (value instanceof Float) return TagType.FLOAT;
-        if (value instanceof Boolean) return TagType.BYTE;
-
-        throw new IllegalArgumentException("Unknown list type: " + value.getClass());
-    }
 }

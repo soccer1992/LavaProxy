@@ -24,8 +24,10 @@ public class LoginHandler extends Handler {
             c.setCompression(packet.threshold);
             return true;
         }
+
         if (p instanceof LoginKick packet){
             String reason = packet.reason;
+            System.out.println(reason);
 
             c.backendConnection.backendDisconnect(reason);
 
@@ -51,9 +53,10 @@ public class LoginHandler extends Handler {
                 tmpOut.readBytes(dta);
                 tmpOut.release();
                 brandMessage.setData(dta);
-                c.writePacketServer(brandMessage);
-                ClientInfo info = c.plr.infoPacket;
+                ClientInfo info = c.backendConnection.plr.infoPacket;
                 c.writePacketServer(info);
+                c.writePacketServer(brandMessage);
+
 
             }
 

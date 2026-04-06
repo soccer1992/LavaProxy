@@ -94,7 +94,7 @@ public enum TagType {
             CompoundTag compound = new CompoundTag(name);
 
             while (true) {
-                TagType type = fromId(in.readByte());
+                TagType type = fromId(in.readUnsignedByte());
                 if (type == END) break;
 
                 String childName = in.readUTF();

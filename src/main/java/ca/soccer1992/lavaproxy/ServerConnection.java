@@ -35,12 +35,15 @@ public class ServerConnection {
                             ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                                 @Override
                                 public void channelInactive(ChannelHandlerContext ctx){
+
+                                    c.backendConnection.backendDisconnect("Connection closed");
                                     c.close();
                                 }
 
                                 @Override
                                 public void channelActive(ChannelHandlerContext ctx) {
                                     //
+                                    System.out.println("Sending handshake & login...");
                                     HandshakePacket p = new HandshakePacket();
                                     p.setIntent(intent);
                                     p.setProtocol(con.protocol);
@@ -56,6 +59,7 @@ public class ServerConnection {
                                         c.plr.uuid = con.plr.uuid;
                                         c.plr.name = con.plr.name;
                                         c.plr.brand = con.plr.brand;
+                                        c.plr.infoPacket = con.plr.infoPacket;
                                         c.backendConnection = con;
                                         c.setReader(new LoginReader());
                                         c.conType = ConnectionTypes.LOGIN;
@@ -69,7 +73,7 @@ public class ServerConnection {
 
                                 @Override
                                 public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-
+                                    cause.printStackTrace();
                                     ctx.close();
                                 }
                             });

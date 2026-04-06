@@ -8,6 +8,8 @@ import io.netty.channel.ChannelHandlerContext;
 import net.kyori.adventure.text.Component;
 
 
+import java.nio.charset.StandardCharsets;
+
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 public class PacketProcessor extends ChannelDuplexHandler {
     public boolean client;
@@ -42,10 +44,14 @@ public class PacketProcessor extends ChannelDuplexHandler {
         ByteBuf read = con.readPacket();
         try {
             while (read != null) {
+
+                System.out.println(read.toString(StandardCharsets.UTF_8));
+
                 if (con.compressionAmount>-1){
                     // check first varInt (0 = uncompressed, anything else = decompressed length)
                     int compLength = readVarInt(read);
                     if (compLength>0){
+
 
                         byte[] tmp = new byte[read.readableBytes()];
                         read.readBytes(tmp);
@@ -55,7 +61,6 @@ public class PacketProcessor extends ChannelDuplexHandler {
                     }
 
                 }
-                //System.out.println(read.toString(StandardCharsets.UTF_8));
                 Packet p = con.processPacket(read,client);
                 read.release();
                 if (p == null) {
@@ -68,6 +73,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
 
             }
         } catch (Exception e){
+            e.printStackTrace();
             con.disconnect(Component.text(e.toString()), true);
         } finally{
             in.release();

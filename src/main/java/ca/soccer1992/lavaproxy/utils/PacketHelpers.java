@@ -114,6 +114,7 @@ public class PacketHelpers {
 
     public static byte[] decompress(byte[] compressed, int expectedSize) {
         try {
+
             Inflater inflater = new Inflater();
             inflater.setInput(compressed);
 
@@ -136,6 +137,7 @@ public class PacketHelpers {
             return bos.toByteArray();
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

@@ -1,6 +1,5 @@
 package ca.soccer1992.lavaproxy.packets;
 
-import ca.soccer1992.lavaproxy.nbt.TagType;
 
 import java.util.HashMap;
 import java.util.Map;

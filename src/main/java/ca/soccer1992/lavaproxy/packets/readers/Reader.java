@@ -18,7 +18,7 @@ public abstract class Reader {
     public Packet read(ByteBuf buf, int ver, boolean forceClient) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         int id = readVarInt(buf);
         Class<? extends Packet> clazz;
-        //System.out.printf("Attempting to read ID %s from protocol %s as %s (IsClient: %s)%n",id,ver,this.getClass(),forceClient);
+        System.out.printf("Attempting to read ID %s from protocol %s as %s (IsClient: %s)%n",id,ver,this.getClass(),forceClient);
         if (!forceClient) {
             clazz = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
         } else {
@@ -63,22 +63,41 @@ public abstract class Reader {
         }
         return correct;
     }
+
+    public static DefinitionPair _nearestLower(List<DefinitionPair> items, int target) {
+        DefinitionPair result = null;
+
+        for (DefinitionPair item : items) {
+
+            int value = item.protocol().getProtocol();
+            //System.out.println(value);
+            //System.out.println(target);
+            //System.out.println(item);
+            if (value <= target && (result == null || value > result.protocol().getProtocol())) {
+                result = item;
+            }
+        }
+
+        return result;
+    }
+
     public Class<? extends Packet> _getPacketFromInfo(MinecraftVersions ver1, int packetID, Map<Class<? extends Packet>, List<DefinitionPair>> definitions){
-        DefinitionPair oldEntry = null;
         int ver = ver1.getProtocol();
+        DefinitionPair correctPair = null;
         Map. Entry<Class<? extends Packet>, List<DefinitionPair>> correct = null;
         for (var e : definitions.entrySet()){
-            for (DefinitionPair pair : e.getValue()){
-                if (pair.packetID() != packetID) continue;
-                if (oldEntry != null){
-                    if (pair.protocol().getProtocol()>ver){
-                        return correct.getKey();
-                    }
+            List<DefinitionPair> filtered = e.getValue().stream().filter(definition -> definition.packetID()==packetID).toList();
+
+            DefinitionPair out = _nearestLower(filtered, ver);
+
+            if (out != null){
+                if (correct == null){
+                    correct = e;
+                    correctPair = out;
+                } else if (out.protocol().getProtocol()>correctPair.protocol().getProtocol()){
+                    correct = e;
+                    correctPair = out;
                 }
-                correct = e;
-
-                oldEntry = pair;
-
             }
         }
         if (correct == null){

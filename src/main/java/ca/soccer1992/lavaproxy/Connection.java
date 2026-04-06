@@ -3,6 +3,7 @@ package ca.soccer1992.lavaproxy;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.HandshakeIntent;
 import ca.soccer1992.lavaproxy.packets.Packet;
+import ca.soccer1992.lavaproxy.packets.client.Transfer;
 import ca.soccer1992.lavaproxy.packets.client.login.CompressionPacket;
 import ca.soccer1992.lavaproxy.packets.client.login.LoginKick;
 import ca.soccer1992.lavaproxy.packets.client.NBTKick;
@@ -52,16 +53,28 @@ public class Connection {
     }
 
     public String fillPlaceholders(String placeholder, String kickMsg, String brand){
+        return fillPlaceholders(placeholder, kickMsg, brand, "", 0);
+    }
+    public String fillPlaceholders(String placeholder, String kickMsg, String brand, String host, int port){
         String conServer = "";
         if (connectedServer != null){
             conServer = connectedServer;
         }
-        return placeholder.replace("{ip}",addr.toString())
+        String addrThing = "";
+        String hostString =  "";
+        if (addr != null){
+            hostString = addr.getHostString();
+            addrThing = addr.toString();
+
+        }
+        return placeholder.replace("{ip}",addrThing)
                 .replace("{player}",plr.toString())
                 .replace("{message}",kickMsg)
                 .replace("{brand}",brand)
                 .replace("{serverName}",conServer)
-                .replace("{ipHost}",addr.getHostString());
+                .replace("{ipHost}",hostString)
+                .replace("{host}", host)
+                .replace("{port}",port+"");
     }
     public void backendDisconnect(Component message){
         backendConnection = null;
@@ -131,6 +144,7 @@ public class Connection {
     }
     public void writePacketServer(Packet p){
         ByteBuf buf = Unpooled.buffer();
+        System.out.println(protoReader.getPacketFromInfo(protocol, p.getClass()));
         writeVarInt(protoReader.getPacketFromInfo(protocol, p.getClass()), buf);
         _writePacket(p, buf);
 
@@ -195,8 +209,21 @@ public class Connection {
 
         _disconnect(reason, true);
     }
+    public void transfer(String host, int port){
+        Transfer p = new Transfer();
+        p.setHost(host);
+        p.setPort(port);
+        writePacket(p);
+
+
+    }
     public void _disconnect(Component reason, boolean nolog){
         if (isClosed) return;
+        try{
+            throw new IllegalArgumentException("no.");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         try {
             switch (conType) {
                 case ConnectionTypes.HANDSHAKE, ConnectionTypes.PRE_STATUS, ConnectionTypes.STATUS:
@@ -216,10 +243,11 @@ public class Connection {
                     nKick.setReason(nbt(reason));
 
                     writePacket(nKick);
-                    close();
+                    //close();
                     break;
             }
         } catch (Exception e){
+            e.printStackTrace();
             close();
         }
         if (nolog) return;
