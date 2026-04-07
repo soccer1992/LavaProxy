@@ -71,6 +71,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
 
             }
         } catch (Exception e){
+            e.printStackTrace();
             con.disconnect(Component.text(e.toString()), true);
         } finally{
             in.release();

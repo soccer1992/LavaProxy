@@ -5,6 +5,7 @@ import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.clientserver.FinishConfiguration;
+import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.KnownPacks;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
@@ -36,6 +37,12 @@ public class ConfigHandler extends Handler{
         }
         if (p instanceof KnownPacks packet){
             c.backendConnection.writePacketServer(packet);
+            return true;
+        }
+        if (p instanceof KeepAlive packet){
+            if (c.backendConnection != null){
+                c.backendConnection.writePacketServer(packet);
+            }
             return true;
         }
         if (p instanceof PluginMessage packet){

@@ -38,12 +38,13 @@ public class ServerConnection {
 
                                     c.backendConnection.backendDisconnect("Connection closed");
                                     c.close();
+                                    group.shutdownGracefully();
+
                                 }
 
                                 @Override
                                 public void channelActive(ChannelHandlerContext ctx) {
                                     //
-                                    System.out.println("Sending handshake & login...");
                                     HandshakePacket p = new HandshakePacket();
                                     p.setIntent(intent);
                                     p.setProtocol(con.protocol);
@@ -81,13 +82,10 @@ public class ServerConnection {
                         }
                     });
 
-            ChannelFuture future = bootstrap.connect(host, port).sync();
-            future.channel().closeFuture().sync();
+            bootstrap.connect(host, port).sync();
 
         } catch (Exception e){
             con.backendDisconnect(e.toString());
-        } finally {
-            group.shutdownGracefully();
         }
         return throughConnection[0];
     }

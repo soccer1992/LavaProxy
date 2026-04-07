@@ -24,7 +24,6 @@ public class ConfigHandler extends Handler {
     public boolean handle(Packet p, Connection c){
         if (p instanceof final NBTKick packet){
             try {
-                System.out.println(packet.reason);
                 c.backendConnection.backendDisconnect(fromJSON(packet.reasonJSON()));
             } catch (Exception e){
                 c.backendConnection.disconnect(e.toString(), true);
@@ -42,8 +41,12 @@ public class ConfigHandler extends Handler {
         }
         if (p instanceof final KeepAlive packet){
 
-            System.out.println("Received KeepAlive");
-            c.writePacket(packet);
+            try {
+
+                c.backendConnection.writePacket(packet);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
             return true;
         }
         if (p instanceof FeatureFlags packet){

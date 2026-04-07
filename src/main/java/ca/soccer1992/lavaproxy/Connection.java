@@ -40,6 +40,7 @@ public class Connection {
     public Connection backendConnection = null;
     public boolean isClosed = false;
     public boolean isBackend = false;
+    public boolean hasDisconnected = false;
 
     public Component _recentDisconnectMessage;
     public Iterator<String> tryIter = Arrays.stream(Main.trys).iterator();
@@ -159,7 +160,6 @@ public class Connection {
     }
     public void _writePacket(Packet p, ByteBuf buf){
         if (isClosed) return;
-
         p.encode(buf, protocol);
         ByteBuf compressedRewritten = Unpooled.buffer();
 
@@ -168,7 +168,7 @@ public class Connection {
             if (buf.readableBytes()>=compressionAmount){
                 writeVarInt(buf.readableBytes(), compressedRewritten);
                 byte[] e = new byte[buf.readableBytes()];
-                buf.readBytes(e);
+                buf.getBytes(buf.readerIndex(), e);
                 byte[] compressed = compress(e);
                 if (compressed == null){
                     close();
@@ -180,18 +180,16 @@ public class Connection {
 
             } else {
                 writeVarInt(0, compressedRewritten);
-                compressedRewritten.writeBytes(buf, 0, buf.readableBytes());
-
+                compressedRewritten.writeBytes(buf, buf.readerIndex(), buf.readableBytes());
             }
 
-        } else        compressedRewritten.writeBytes(buf, 0, buf.readableBytes());
+        } else        compressedRewritten.writeBytes(buf, buf.readerIndex(), buf.readableBytes());
         //System.out.println(compressedRewritten.toString(StandardCharsets.UTF_8));
 
         ByteBuf rewritten14 = Unpooled.buffer();
         writeVarInt(compressedRewritten.readableBytes(), rewritten14);
         rewritten14.writeBytes(compressedRewritten, 0, compressedRewritten.readableBytes());
-        buf.release();
-        compressedRewritten.release();
+
         nChannel.writeAndFlush(rewritten14);
 
     }
@@ -220,11 +218,13 @@ public class Connection {
 
     }
     public void _disconnect(Component reason, boolean nolog){
-        if (isClosed) return;
+        if (isClosed || hasDisconnected) return;
         if (isBackend){
             backendConnection.backendDisconnect(reason);
             return;
         }
+        hasDisconnected = true;
+        //new Exception(json(reason)).printStackTrace();
         try {
             switch (conType) {
                 case ConnectionTypes.HANDSHAKE, ConnectionTypes.PRE_STATUS, ConnectionTypes.STATUS:

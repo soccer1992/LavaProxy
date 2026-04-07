@@ -17,6 +17,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                 con.close();
             }
         } catch (Exception e){
+            e.printStackTrace();
              con.disconnect(e.getMessage(),true);
         }
 

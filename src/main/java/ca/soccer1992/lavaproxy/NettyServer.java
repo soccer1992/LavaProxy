@@ -25,6 +25,7 @@ public class NettyServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
+
                             Main.CON_AMOUNT += 1;
                             ch.attr(Main.READER).set(new Connection(ch));
                             ch.pipeline().addFirst(new PacketProcessor(false));
