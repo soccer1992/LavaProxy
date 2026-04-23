@@ -24,6 +24,8 @@ public class ServerConnection {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
+                            ch.setOption(ChannelOption.TCP_NODELAY, true);
+
                             Connection c = new Connection(ch);
                             ch.attr(Main.READER).set(c);
                             throughConnection[0] = c;

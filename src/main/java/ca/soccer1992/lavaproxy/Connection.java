@@ -83,6 +83,15 @@ public class Connection {
     }
 
     public void backendDisconnect(Component message){
+        if (isBackend){
+
+            backendConnection.backendDisconnect(message);
+
+            return;
+        }
+        if (!backendConnection.isClosed){
+            backendConnection.close();
+        }
         backendConnection = null;
         _recentDisconnectMessage = parser.deserialize(fillPlaceholders(Main.translations.get("backend.player.disconnect"), miniMessage(message), plr.brand)); //Component.text("You have been disconnected from " + connectedServer + ": ").color(NamedTextColor.RED).append(message);
 
@@ -94,6 +103,7 @@ public class Connection {
             return;
         }
         if (!tryIter.hasNext()){
+
             noLogDisconnect(_recentDisconnectMessage);
         } else {
             String next = tryIter.next();

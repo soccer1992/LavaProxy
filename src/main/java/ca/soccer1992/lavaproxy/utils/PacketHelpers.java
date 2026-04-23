@@ -5,10 +5,8 @@ import io.netty.buffer.ByteBuf;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-
 public class PacketHelpers {
     private static final int SEGMENT_BITS = 0x7F;
     private static final int CONTINUE_BIT = 0x80;
@@ -34,14 +32,7 @@ public class PacketHelpers {
 
         return value;
     }
-    public static String dashUUID(String uuid){
-        return uuid.substring(0,8) + "-" +
-                uuid.substring(8,12) + "-" +
-                uuid.substring(12,16) + "-" +
-                uuid.substring(16, 20) + "-" +
-                uuid.substring(20);
 
-    }
     public static int readVarInt(ByteBuf buf) {
         int read = buf.readableBytes();
         if (read == 0) {
@@ -85,10 +76,6 @@ public class PacketHelpers {
         writeVarInt(str.length(), buf);
         buf.writeCharSequence(str, StandardCharsets.UTF_8);
 
-    }
-    public static Object readWithoutEat(Function<ByteBuf,Object> readFunc, ByteBuf buf){
-        ByteBuf clone = buf.copy();
-        return readFunc.apply(clone);
     }
     public static byte[] compress(byte[] data) {
         try {
@@ -137,7 +124,6 @@ public class PacketHelpers {
             return bos.toByteArray();
 
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }

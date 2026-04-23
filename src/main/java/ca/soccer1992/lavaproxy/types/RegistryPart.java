@@ -1,4 +1,4 @@
-package ca.soccer1992.lavaproxy.packets;
+package ca.soccer1992.lavaproxy.types;
 
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import io.netty.buffer.ByteBuf;
@@ -20,6 +20,6 @@ public record RegistryPart(String entry, CompoundTag nbt, int id, boolean hasNBT
 
             }
         }
-        
+
     }
 }

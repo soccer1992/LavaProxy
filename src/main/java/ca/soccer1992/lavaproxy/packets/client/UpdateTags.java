@@ -2,7 +2,7 @@ package ca.soccer1992.lavaproxy.packets.client;
 
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
-import ca.soccer1992.lavaproxy.packets.ItemTagArray;
+import ca.soccer1992.lavaproxy.types.ItemTagArray;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import io.netty.buffer.ByteBuf;
 

@@ -1,6 +1,7 @@
 package ca.soccer1992.lavaproxy;
 
 import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
+import ca.soccer1992.lavaproxy.types.KnownPack;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -12,6 +13,12 @@ public class Player {
     public String brand = "";
     public ClientInfo infoPacket = null;
     public ArrayList<String> enabled_features = new ArrayList<>();
+    public ArrayList<KnownPack> knownPacks;
+
+    public void setKnownPacks(ArrayList<KnownPack> knownPack){
+        this.knownPacks = knownPack;
+
+    }
 
     public void setUUID(UUID uuid){
         this.uuid = uuid;

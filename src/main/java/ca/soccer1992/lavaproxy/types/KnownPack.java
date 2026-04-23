@@ -1,4 +1,4 @@
-package ca.soccer1992.lavaproxy.packets;
+package ca.soccer1992.lavaproxy.types;
 
 import io.netty.buffer.ByteBuf;
 

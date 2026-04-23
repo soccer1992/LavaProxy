@@ -22,6 +22,7 @@ public class LoginHandler extends Handler{
             }
             c.plr.setName(packet.playerName);
             c.plr.setUUID(packet.uuid);
+            c.sendCompression(256);
 
             System.out.println(c.fillPlaceholders(Main.translations.get("log.connect"), "", ""));
 

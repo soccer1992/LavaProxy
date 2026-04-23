@@ -87,11 +87,23 @@ public enum MinecraftVersions {
         this.protocol = protocol;
         this.names = names;
     }
+    public boolean isGreater(MinecraftVersions ver){
+        return getProtocol() > ver.getProtocol();
+    }
+    public boolean isGreaterEquals(MinecraftVersions ver){
+        return getProtocol() >= ver.getProtocol();
+    }
+    public boolean isLess(MinecraftVersions ver){
+        return !isGreater(ver);
+    }
+    public boolean isLessEquals(MinecraftVersions ver){
+        return !isGreaterEquals(ver);
+    }
     public int getProtocol() {
         return protocol == -1 ? snapshotProtocol : protocol;
     }
     private final int protocol;
     private final int snapshotProtocol;
-    private final String[] names;
+    public final String[] names;
     // its all Velocity? Always has been.
 }

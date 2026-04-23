@@ -24,7 +24,6 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         servers.put("lobby", new ArrayList<>(List.of("127.0.0.1",25565)));
-
         translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
         translations.put("log.ping","{ip} has pinged");
         translations.put("backend.transfer","{player} is getting transfered to: {host}:{port}");

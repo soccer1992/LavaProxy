@@ -31,6 +31,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
                 con.backendConnection.close();
             }
         }
+        ctx.fireChannelInactive();
     }
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg){
