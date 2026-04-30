@@ -8,10 +8,7 @@ import net.kyori.adventure.text.serializer.json.*;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.querz.nbt.tag.ListTag;
-import net.querz.nbt.tag.StringTag;
-
 import net.querz.nbt.tag.CompoundTag;
-import net.querz.nbt.io.SNBTUtil;
 public class ComponentUtils {
     public static MiniMessage parser = MiniMessage.miniMessage();
     public static String json(Component comp) {
@@ -29,46 +26,72 @@ public class ComponentUtils {
     public static Component fromNBT(CompoundTag tag) {
         return fromJSON(tag.toString());
     }
-    public static CompoundTag nbt(Component comp){
+    public static CompoundTag nbt(Component comp) {
         String json = json(comp);
-        //CompoundTag out = new CompoundTag("");
-        //Nbt NBT = new Nbt();
-        if (json.startsWith("{")){
-            try {
-                CompoundTag parsed = (CompoundTag) SNBTUtil.fromSNBT(json);
-                return parsed;
-            } catch (Exception e){
-                e.printStackTrace();
-                return null;
+
+        // Ensure it's a JSON object
+        com.google.gson.JsonObject obj;
+        try {
+            com.google.gson.JsonElement el = com.google.gson.JsonParser.parseString(json);
+            if (el.isJsonObject()) {
+                obj = el.getAsJsonObject();
+            } else {
+                // wrap primitives/arrays
+                obj = new com.google.gson.JsonObject();
+                obj.add("text", new com.google.gson.JsonPrimitive(""));
+                obj.add("extra", el.isJsonArray() ? el : com.google.gson.JsonParser.parseString("[" + json + "]"));
             }
-        } else if (json.startsWith("[")){
-
-            try {
-                ListTag parsed = (ListTag) SNBTUtil.fromSNBT(json);
-                CompoundTag out = new CompoundTag();
-                out.put("extra",parsed);
-                out.putString("text","");
-                return out;
-            } catch (Exception e){
-                return null;
-            }
-
-        } else if ((json.startsWith("\"") && json.endsWith("\"")) || (json.startsWith("'") && json.endsWith("'"))){
-            try {
-                StringTag parsed = (StringTag) SNBTUtil.fromSNBT(json);
-                CompoundTag out = new CompoundTag();
-                out.put("text",parsed);
-                return out;
-            } catch (Exception e){
-                return null;
-            }
-
-        } else {
-            CompoundTag out = new CompoundTag();
-            out.putString("text",json);
-            return out;
-
+        } catch (Exception e) {
+            obj = new com.google.gson.JsonObject();
+            obj.addProperty("text", json);
         }
+
+        return jsonObjectToCompound(obj);
+    }
+    public static String compoundToJson(CompoundTag tag) {
+        com.google.gson.JsonObject obj = new com.google.gson.JsonObject();
+        for (String key : tag.keySet()) {
+            net.querz.nbt.tag.Tag<?> val = tag.get(key);
+            if (val instanceof CompoundTag) {
+                obj.add(key, com.google.gson.JsonParser.parseString(compoundToJson((CompoundTag) val)));
+            } else if (val instanceof net.querz.nbt.tag.StringTag) {
+                obj.addProperty(key, ((net.querz.nbt.tag.StringTag) val).getValue());
+            } else if (val instanceof net.querz.nbt.tag.IntTag) {
+                obj.addProperty(key, ((net.querz.nbt.tag.IntTag) val).asInt());
+            } else if (val instanceof net.querz.nbt.tag.LongTag) {
+                obj.addProperty(key, ((net.querz.nbt.tag.LongTag) val).asLong());
+            }
+        }
+        return obj.toString();
+    }
+
+    private static CompoundTag jsonObjectToCompound(com.google.gson.JsonObject obj) {
+        CompoundTag tag = new CompoundTag();
+        for (var entry : obj.entrySet()) {
+            com.google.gson.JsonElement val = entry.getValue();
+            if (val.isJsonPrimitive()) {
+                com.google.gson.JsonPrimitive prim = val.getAsJsonPrimitive();
+                if (prim.isString()) tag.putString(entry.getKey(), prim.getAsString());
+                else if (prim.isBoolean()) tag.putBoolean(entry.getKey(), prim.getAsBoolean());
+                else if (prim.isNumber()) tag.putInt(entry.getKey(), prim.getAsInt());
+            } else if (val.isJsonObject()) {
+                tag.put(entry.getKey(), jsonObjectToCompound(val.getAsJsonObject()));
+            } else if (val.isJsonArray()) {
+                ListTag<CompoundTag> list = new ListTag<>(CompoundTag.class);
+                for (com.google.gson.JsonElement el : val.getAsJsonArray()) {
+                    if (el.isJsonObject()) {
+                        list.add(jsonObjectToCompound(el.getAsJsonObject()));
+                    } else if (el.isJsonPrimitive()) {
+                        // string elements in extra array - wrap them
+                        CompoundTag wrapped = new CompoundTag();
+                        wrapped.putString("text", el.getAsString());
+                        list.add(wrapped);
+                    }
+                }
+                tag.put(entry.getKey(), list);
+            }
+        }
+        return tag;
     }
 
 }

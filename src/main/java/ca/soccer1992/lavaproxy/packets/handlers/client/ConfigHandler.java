@@ -14,8 +14,14 @@ import ca.soccer1992.lavaproxy.packets.clientserver.KnownPacks;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.handlers.Handler;
 import ca.soccer1992.lavaproxy.packets.server.FeatureFlags;
+import ca.soccer1992.lavaproxy.types.RegistryPart;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.querz.nbt.tag.CompoundTag;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.fromJSON;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.readString;
@@ -41,6 +47,22 @@ public class ConfigHandler extends Handler {
             return true;
         }
         if (p instanceof final RegistryData packet){
+            if (Objects.equals(packet.id.name(), "dimension_type")){
+                CompoundTag codec = new CompoundTag();
+                Map<String, Integer> dimMap = new HashMap<>();
+                for (RegistryPart part : packet.RegistryData.values()){
+                    if (!part.hasNBT()){
+                        continue;
+                        //throw new IllegalArgumentException("dimension_type does not have NBT attached to RegistryPart");
+                    }
+                    CompoundTag t = part.nbt();
+                    codec.put(part.entry(),t); // confirmed to have nbt
+                    dimMap.put(part.entry(), part.id());
+
+                }
+                c._dimensionMap = dimMap;
+                c._dimensionCodec = codec;
+            }
             backendConnection.writePacket(packet);
             return true;
         }

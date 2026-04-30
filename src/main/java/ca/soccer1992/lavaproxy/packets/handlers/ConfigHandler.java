@@ -23,7 +23,8 @@ public class ConfigHandler extends Handler{
         //System.out.println("CLIENT");
         if (p instanceof ClientInfo packet) {
             c.plr.setInfo(packet);
-            c.connect(c.tryIter.next());
+            if (c.backendConnection.conType == ConnectionTypes.CONFIG) c.backendConnection.writePacket(packet);
+            //c.connect(c.tryIter.next());
             //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing (CONFIGURATION)</rainbow>"),false);
 
             return true;

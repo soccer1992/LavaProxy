@@ -18,7 +18,7 @@ public abstract class Reader {
     public Packet read(ByteBuf buf, int ver, boolean forceClient) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         int id = readVarInt(buf);
         Class<? extends Packet> clazz;
-        //System.out.printf("Attempting to read ID %s from protocol %s as %s (IsClient: %s)%n",id,ver,this.getClass(),forceClient);
+        System.out.printf("Attempting to read ID %s from protocol %s as %s (IsClient: %s)%n",id,ver,this.getClass(),forceClient);
         if (!forceClient) {
             clazz = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
         } else {

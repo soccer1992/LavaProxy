@@ -15,6 +15,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import net.kyori.adventure.text.Component;
+import net.querz.nbt.tag.CompoundTag;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.*;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
@@ -24,6 +25,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Connection {
     public final Channel nChannel;
@@ -42,7 +44,11 @@ public class Connection {
     public boolean isClosed = false;
     public boolean isBackend = false;
     public boolean hasDisconnected = false;
+    public String _dimensionName = null;
+    public Map<String, Integer> _dimensionMap = null;
 
+    public CompoundTag _dimensionCodec = null;
+    public CompoundTag _dimInfo = null;
     public Component _recentDisconnectMessage;
     public Iterator<String> tryIter = Arrays.stream(Main.trys).iterator();
     public void setCompression(int amt){
@@ -119,7 +125,6 @@ public class Connection {
         setCompression(-1);
         setReader(new HandshakeReader());
         setHandler(new HandshakeHandler());
-
         this.plr = new Player(this);
 
     }

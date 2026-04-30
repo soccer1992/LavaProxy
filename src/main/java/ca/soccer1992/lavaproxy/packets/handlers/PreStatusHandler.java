@@ -9,8 +9,7 @@ import ca.soccer1992.lavaproxy.packets.readers.StatusReader;
 import ca.soccer1992.lavaproxy.packets.server.status.*;
 import net.querz.nbt.tag.CompoundTag;
 
-import static ca.soccer1992.lavaproxy.utils.NBTUtil.snbt;
-
+import static ca.soccer1992.lavaproxy.utils.ComponentUtils.compoundToJson;
 public class PreStatusHandler extends Handler{
     public boolean handle(Packet p, Connection c){
         if (p instanceof PingRequest packet){
@@ -32,7 +31,7 @@ public class PreStatusHandler extends Handler{
             desc.putString("text","A LavaProxy proxy.\nTotal connections: " + Main.CON_AMOUNT);
             info.put("description",desc);
             try {
-                response.setJSON(snbt(info));
+                response.setJSON(compoundToJson(info));
             } catch (Exception e){
                 c.close();
             }

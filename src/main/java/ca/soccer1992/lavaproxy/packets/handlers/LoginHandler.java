@@ -9,7 +9,7 @@ import ca.soccer1992.lavaproxy.packets.client.login.LoginSuccess;
 import ca.soccer1992.lavaproxy.packets.readers.ConfigReader;
 import ca.soccer1992.lavaproxy.packets.server.LoginAck;
 import ca.soccer1992.lavaproxy.packets.server.LoginStart;
-
+import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 
 
 public class LoginHandler extends Handler{
@@ -22,7 +22,7 @@ public class LoginHandler extends Handler{
             }
             c.plr.setName(packet.playerName);
             c.plr.setUUID(packet.uuid);
-            c.sendCompression(256);
+            //c.sendCompression(256);
 
             System.out.println(c.fillPlaceholders(Main.translations.get("log.connect"), "", ""));
 
@@ -31,8 +31,8 @@ public class LoginHandler extends Handler{
             success.setName(c.plr.name);
             success.setUUID(c.plr.uuid);
             if (c.protocol.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
-                //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing (<1.20.2 LOGIN KICK)</rainbow>"),false);
-                c.connect(c.tryIter.next());
+                c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing (<1.20.2 LOGIN KICK)</rainbow>"),false);
+                //c.connect(c.tryIter.next());
 
 //                ConfigHandler.handlePlay(c);
 
@@ -56,7 +56,7 @@ public class LoginHandler extends Handler{
                 c.disconnect("LoginAck sent before LoginSuccess", true);
                 return true;
             }
-
+            //System.out.println("switched to config");
 
             c.setReader(new ConfigReader());
             c.conType = ConnectionTypes.CONFIG;
@@ -64,6 +64,7 @@ public class LoginHandler extends Handler{
             //new ServerConnection().connect(c, HandshakeIntent.LOGIN, "127.0.0.1",25565);
 
             c.setHandler(new ConfigHandler());
+            c.connect(c.tryIter.next());
             return true;
         }
 

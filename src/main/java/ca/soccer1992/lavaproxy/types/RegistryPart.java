@@ -17,7 +17,6 @@ public record RegistryPart(String entry, CompoundTag nbt, int id, boolean hasNBT
             try {
                 convertAuto(nbt, new ByteBufOutputStream(buf),proto);
             } catch (Exception ignored){
-
             }
         }
 

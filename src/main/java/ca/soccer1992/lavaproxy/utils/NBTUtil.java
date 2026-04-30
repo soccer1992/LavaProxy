@@ -3,7 +3,6 @@ package ca.soccer1992.lavaproxy.utils;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.Unpooled;
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.io.SNBTUtil;
@@ -28,19 +27,34 @@ public class NBTUtil {
         }
 
     }
-    public static NamedTag streamModern(ByteBuf buf){
-
+    public static NamedTag streamModern(ByteBuf buf) {
         try {
-            ByteBuf combined = Unpooled.wrappedBuffer(
-                    buf.readSlice(1),  // the type byte
-                    Unpooled.wrappedBuffer(new byte[]{0x00, 0x00}), // empty name length
-                    buf  // rest of the payload
-            );
-            NamedTag t = streamLegacy(combined);
-            t.setName(null);
-            return t;
+            byte type = buf.readByte();
+            int remaining = buf.readableBytes();
+            byte[] data = new byte[remaining];
+            buf.getBytes(buf.readerIndex(), data); // peek
 
+            // add type, (null-length) and wrap in a counting stream
+            byte[] full = new byte[3 + remaining];
+            full[0] = type;
+            full[1] = 0x00;
+            full[2] = 0x00;
+            System.arraycopy(data, 0, full, 3, remaining);
+
+            java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(full);
+            NamedTag t = new NBTDeserializer(false).fromStream(bais);
+
+            // bais.available() tells us how many bytes are LEFT unread
+            int consumed = full.length - bais.available();
+            // subtract the 3 header bytes injected
+            int fromBuf = consumed - 3;
+
+            buf.readerIndex(buf.readerIndex() + fromBuf); // advance buf correctly
+
+            if (t != null) t.setName(null);
+            return t;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

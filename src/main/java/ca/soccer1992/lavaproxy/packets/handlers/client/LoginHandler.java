@@ -47,17 +47,19 @@ public class LoginHandler extends Handler {
                 c.conType = ConnectionTypes.CONFIG;
                 c.setReader(new ConfigReader());
                 c.setHandler(new ConfigHandler());
-                PluginMessage brandMessage = new PluginMessage();
-                brandMessage.setChannel("minecraft:brand");
-                ByteBuf tmpOut = Unpooled.buffer();
-                writeString(c.backendConnection.plr.brand,tmpOut);
-                byte[] dta = new byte[tmpOut.readableBytes()];
-                tmpOut.readBytes(dta);
-                tmpOut.release();
-                brandMessage.setData(dta);
+                if (c.backendConnection.plr.brand==null) {
+                    PluginMessage brandMessage = new PluginMessage();
+                    brandMessage.setChannel("minecraft:brand");
+                    ByteBuf tmpOut = Unpooled.buffer();
+                    writeString(c.backendConnection.plr.brand, tmpOut);
+                    byte[] dta = new byte[tmpOut.readableBytes()];
+                    tmpOut.readBytes(dta);
+                    tmpOut.release();
+                    brandMessage.setData(dta);
+                    c.writePacketServer(brandMessage);
+                }
                 ClientInfo info = c.backendConnection.plr.infoPacket;
-                c.writePacketServer(info);
-                c.writePacketServer(brandMessage);
+                if (info != null) c.writePacketServer(info);
 
 
             }
