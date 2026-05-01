@@ -8,7 +8,6 @@ import ca.soccer1992.lavaproxy.types.RegistryPart;
 import io.netty.buffer.ByteBuf;
 import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.CompoundTag;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public class RegistryData extends Packet {
     public Map<Integer, RegistryPart> RegistryData;
     public Identifier id;
     public ConnectionTypes getType() { return ConnectionTypes.CONFIG; }
-    public String name = "UpdateTags";
+    public String name = "RegistryData";
 
     public void decode (ByteBuf buf, MinecraftVersions proto){
         RegistryData = new HashMap<>();

@@ -2,6 +2,7 @@ package ca.soccer1992.lavaproxy.packets.readers;
 
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.DefinitionPair;
+import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import io.netty.buffer.ByteBuf;
 
@@ -19,19 +20,25 @@ public abstract class Reader {
         int id = readVarInt(buf);
         Class<? extends Packet> clazz;
         //System.out.printf("Attempting to read ID %s from protocol %s as %s (IsClient: %s)%n",id,ver,this.getClass(),forceClient);
+        MinecraftVersions mVer = MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver);
         if (!forceClient) {
-            clazz = getPacketFromInfo(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
+            clazz = getPacketFromInfo(mVer, id);
         } else {
-            clazz = getPacketFromInfoClient(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver), id);
+            clazz = getPacketFromInfoClient(mVer, id);
 
         }
+
         if (clazz == null){
-            return null;
+            InvalidPacket invalid = new InvalidPacket();
+            invalid.decode(buf, mVer);
+            invalid.id = id;
+            return invalid;
         }
+
 
         Packet p = clazz.getDeclaredConstructor().newInstance();
 
-        p.decode(buf, MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(ver));
+        p.decode(buf, mVer);
         return p;
     }
     public int getPacketFromInfo(MinecraftVersions ver, Class<? extends Packet> packet){
@@ -91,10 +98,11 @@ public abstract class Reader {
             DefinitionPair out = _nearestLower(filtered, ver);
 
             if (out != null){
-                if (correct == null){
-                    correct = e;
-                    correctPair = out;
-                } else if (out.protocol().getProtocol()>correctPair.protocol().getProtocol()){
+                DefinitionPair newerDef = _nearestLower(e.getValue(), ver);
+                if (newerDef != null && newerDef.packetID() != packetID) {
+                    continue;
+                }
+                if (correct == null || out.protocol().getProtocol() > correctPair.protocol().getProtocol()){
                     correct = e;
                     correctPair = out;
                 }

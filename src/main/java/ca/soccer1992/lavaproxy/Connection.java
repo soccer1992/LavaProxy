@@ -2,6 +2,7 @@ package ca.soccer1992.lavaproxy;
 
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.HandshakeIntent;
+import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.Transfer;
 import ca.soccer1992.lavaproxy.packets.client.login.CompressionPacket;
@@ -28,7 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Connection {
-    public final Channel nChannel;
+    private final Channel nChannel;
     public MinecraftVersions protocol;
     public InetSocketAddress connectAddr;
     public int compressionAmount;
@@ -164,6 +165,9 @@ public class Connection {
     public void writePacket(Packet p){
         ByteBuf buf = Unpooled.buffer();
         int cID = protoReader.getPacketFromInfoClient(protocol, p.getClass());
+        if (p instanceof InvalidPacket packet){
+            cID = packet.id;
+        }
         if (cID == 0xffff) return;
         writeVarInt(cID, buf);
         _writePacket(p, buf);
@@ -171,7 +175,11 @@ public class Connection {
     public void writePacketServer(Packet p){
         ByteBuf buf = Unpooled.buffer();
         //System.out.println(protoReader.getPacketFromInfo(protocol, p.getClass()));
+
         int cID = protoReader.getPacketFromInfo(protocol, p.getClass());
+        if (p instanceof InvalidPacket packet){
+            cID = packet.id;
+        }
         if (cID == 0xffff) return;
         writeVarInt(cID, buf);
         _writePacket(p, buf);

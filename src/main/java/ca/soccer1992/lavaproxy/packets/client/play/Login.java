@@ -1,4 +1,4 @@
-package ca.soccer1992.lavaproxy.packets.client;
+package ca.soccer1992.lavaproxy.packets.client.play;
 
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
@@ -68,6 +68,7 @@ public class Login extends Packet {
         buf.writeByte(oldGamemode);
         buf.writeBoolean(debugWorld);
         buf.writeBoolean(flatWorld);
+        buf.writeBoolean(deathPos != null);
 
         if (deathPos != null) {
             deathPos.write(buf,proto);

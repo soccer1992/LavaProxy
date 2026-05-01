@@ -5,7 +5,6 @@ import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.types.KnownPack;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import io.netty.buffer.ByteBuf;
-
 import java.util.ArrayList;
 
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.readVarInt;
@@ -22,6 +21,7 @@ public class KnownPacks extends Packet {
         for (int i=0; i < amount; i ++){
             packs.add(KnownPack.read(buf));
         }
+
     }
     public void encode(ByteBuf buf, MinecraftVersions proto){
         writeVarInt(packs.size(),buf);

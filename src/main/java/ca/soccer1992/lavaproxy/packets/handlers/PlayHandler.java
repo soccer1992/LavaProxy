@@ -3,7 +3,9 @@ package ca.soccer1992.lavaproxy.packets.handlers;
 import ca.soccer1992.lavaproxy.Connection;
 import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
+import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
+import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
 import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
@@ -26,13 +28,22 @@ public class PlayHandler extends Handler{
         //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Connected to " + c.connectedServer + "</rainbow>"), false);
     }
     public boolean handle(Packet p, Connection c){
+        if (c.backendConnection == null) return true;
         if (p instanceof ClientInfo packet) {
             c.plr.setInfo(packet);
-            c.backendConnection.writePacket(packet);
+            c.backendConnection.writePacketServer(packet);
             return true;
         }
         if (p instanceof PluginMessage packet) {
-            c.backendConnection.writePacket(packet);
+            c.backendConnection.writePacketServer(packet);
+            return true;
+        }
+        if (p instanceof InvalidPacket packet ){
+            c.backendConnection.writePacketServer(packet);
+            return true;
+        }
+        if (p instanceof KeepAlive packet) {
+            c.backendConnection.writePacketServer(packet);
             return true;
         }
         return false;

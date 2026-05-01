@@ -4,6 +4,7 @@ import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.DefinitionPair;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.*;
+import ca.soccer1992.lavaproxy.packets.client.play.*;
 import ca.soccer1992.lavaproxy.packets.clientserver.*;
 import ca.soccer1992.lavaproxy.packets.server.*;
 
@@ -32,6 +33,25 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x15)
 
 
+            ),
+            KeepAlive.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x00),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x0B),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12, 0x0C),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12_1, 0x0B),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_13, 0x0E),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_14, 0x0F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_16, 0x10),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_17, 0x0F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x11),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x12),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x11),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x12),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x14),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_3, 0x15),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x18),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x1A),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x1B)
             )
     );
     public Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of(
@@ -105,6 +125,28 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x2C),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x2B),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x30)
+            ),
+            BundleDelimiter.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x00)
+            ),
+            KeepAlive.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x00),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x1F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_13, 0x21),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_14, 0x20),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_15, 0x21),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_16, 0x20),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_16_2, 0x1F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_17, 0x21),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x1E),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x20),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x1F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x23),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x24),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x26),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x27),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x26),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x2B)
             )
             );
 
