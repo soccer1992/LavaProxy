@@ -27,11 +27,11 @@ public class Main {
         translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
         translations.put("log.ping","{ip} has pinged");
         translations.put("backend.transfer","{player} is getting transfered to: {host}:{port}");
-
         translations.put("log.connect","{player} ({ipHost}) has started login.");
+        translations.put("log.connected","{player} has connected to {serverName}");
+        translations.put("error.unsupported","<red>Your protocol is too old/new for LavaProxy.</red>");
         translations.put("log.disconnect","{player} has disconnected for: {message}");
         translations.put("log.brand","{player} brand: {brand}");
-
         translations.put("backend.disconnect","{player} has disconnected from {serverName}: {message}");
         translations.put("backend.brand","{backendBrand} [LavaProxy]");
 

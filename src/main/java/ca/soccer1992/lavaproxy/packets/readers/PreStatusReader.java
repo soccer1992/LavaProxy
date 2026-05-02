@@ -11,7 +11,7 @@ import java.util.Map;
 public class PreStatusReader extends Reader {
     public Map<Class<? extends Packet>, List<DefinitionPair>> serverDefinitions = Map.of(
             StatusRequest.class, List.of(
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_8, 0x00)
+                    new DefinitionPair(MinecraftVersions.UNSUPPORTED, 0x00)
             )
     );
     @Override

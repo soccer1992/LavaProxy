@@ -45,8 +45,9 @@ public class ConfigHandler extends Handler{
             return true;
         }
         if (p instanceof KeepAlive packet){
-
+            if (c.keepAliveList.remove(packet.id) != null) return true;
             if (c.backendConnection != null){
+
                 //System.out.println(c.backendConnection.protoReader + "keepalive");
                 c.backendConnection.writePacketServer(packet);
             }

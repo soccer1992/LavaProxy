@@ -8,6 +8,7 @@ import ca.soccer1992.lavaproxy.packets.client.Transfer;
 import ca.soccer1992.lavaproxy.packets.client.login.CompressionPacket;
 import ca.soccer1992.lavaproxy.packets.client.login.LoginKick;
 import ca.soccer1992.lavaproxy.packets.client.NBTKick;
+import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.handlers.*;
 import ca.soccer1992.lavaproxy.packets.readers.*;
 import ca.soccer1992.lavaproxy.packets.readers.Reader;
@@ -23,10 +24,7 @@ import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class Connection {
     private final Channel nChannel;
@@ -47,7 +45,7 @@ public class Connection {
     public boolean hasDisconnected = false;
     public String _dimensionName = null;
     public Map<String, Integer> _dimensionMap = null;
-
+    public Map<Long, Long> keepAliveList = new HashMap<>();
     public CompoundTag _dimensionCodec = null;
     public CompoundTag _dimInfo = null;
     public Component _recentDisconnectMessage;
@@ -61,6 +59,12 @@ public class Connection {
         } catch (Exception e){
             backendDisconnect(Component.text(message));
         }
+    }
+    public void sendKeepAlive() {
+        KeepAlive k = new KeepAlive();
+        k.id = System.currentTimeMillis(); // no bit tricks
+        keepAliveList.put(k.id, k.id);
+        writePacket(k);
     }
 
     public String fillPlaceholders(String placeholder, String kickMsg, String brand){
@@ -160,6 +164,13 @@ public class Connection {
     }
 
     public Packet processPacket(ByteBuf p, boolean forceClient) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        for (Long z : keepAliveList.keySet()){
+            if (System.currentTimeMillis() > z+30000 ){
+                backendConnection.backendDisconnect(Component.translatable("disconnect.timeout"));
+                keepAliveList.remove(z);
+            }
+        }
+
         return protoReader.read(p, protocol.getProtocol(),forceClient);
     }
     public void writePacket(Packet p){
@@ -312,7 +323,6 @@ public class Connection {
                 heldData.resetReaderIndex();
                 return null;
             }
-
             return heldData.readBytes(len);
 
         } catch (Exception e) {

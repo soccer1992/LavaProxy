@@ -19,7 +19,9 @@ public class HandshakePacket extends Packet {
     public void setProtocol(MinecraftVersions proto){
         this.proto = proto;
     }
-    public void setProtocol(int proto){setProtocol(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(proto));}
+    public void setProtocol(int proto){
+        setProtocol(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(proto));
+    }
     public void setIntent(HandshakeIntent intent){this.intent = intent;}
     public void setHost(String host){this.host = host;}
     public void decode (ByteBuf buf, MinecraftVersions proto){

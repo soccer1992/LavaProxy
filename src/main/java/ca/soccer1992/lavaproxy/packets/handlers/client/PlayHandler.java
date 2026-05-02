@@ -1,6 +1,7 @@
 package ca.soccer1992.lavaproxy.packets.handlers.client;
 
 import ca.soccer1992.lavaproxy.Connection;
+import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.play.*;
@@ -10,9 +11,12 @@ import ca.soccer1992.lavaproxy.packets.handlers.Handler;
 public class PlayHandler extends Handler {
 
     public boolean handle(Packet p, Connection c) {
+        //System.out.println("[OUT] " + p.getClass().getSimpleName());
         if (p instanceof Login packet){
             c._dimensionName = packet.dimension;
             c.backendConnection.writePacket(packet);
+            System.out.println(c.backendConnection.fillPlaceholders(Main.translations.get("log.connected"), "", c.backendConnection.plr.brand));
+
             //c._dimInfo = c._dimensionCodec.getCompoundTag(packet.dimension);
             //System.out.println(c._dimInfo);
             //c.backendConnection.backendDisconnect(ComponentUtils.parser.deserialize("<rainbow>Simulation distance: " + packet.simDist + "</rainbow><br>" + c._dimensionName));
@@ -31,6 +35,7 @@ public class PlayHandler extends Handler {
             return true;
         }
         if (p instanceof KeepAlive packet) {
+            if (c.keepAliveList.remove(packet.id) != null) return true;
             c.backendConnection.writePacket(packet);
             return true;
         }

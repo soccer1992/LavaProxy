@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum MinecraftVersions {
+    UNSUPPORTED(0,
+            "Unsupported"),
     MINECRAFT_1_7_2(4,
                             "1.7.2", "1.7.3", "1.7.4", "1.7.5"),
     MINECRAFT_1_7_6(5,

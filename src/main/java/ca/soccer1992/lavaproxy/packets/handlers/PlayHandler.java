@@ -28,6 +28,8 @@ public class PlayHandler extends Handler{
         //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Connected to " + c.connectedServer + "</rainbow>"), false);
     }
     public boolean handle(Packet p, Connection c){
+        //System.out.printf("[IN] " + p.getClass().getSimpleName() + " ");
+
         if (c.backendConnection == null) return true;
         if (p instanceof ClientInfo packet) {
             c.plr.setInfo(packet);
@@ -43,6 +45,7 @@ public class PlayHandler extends Handler{
             return true;
         }
         if (p instanceof KeepAlive packet) {
+            if (c.keepAliveList.remove(packet.id) != null) return true;
             c.backendConnection.writePacketServer(packet);
             return true;
         }

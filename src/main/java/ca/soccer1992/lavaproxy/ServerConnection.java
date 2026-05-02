@@ -69,6 +69,13 @@ public class ServerConnection {
                                         c.conType = ConnectionTypes.LOGIN;
                                         c.setHandler(new LoginHandler());
                                         c.writePacketServer(login);
+                                        if (con.conType != ConnectionTypes.HANDSHAKE
+                                                && con.conType != ConnectionTypes.LOGIN
+                                                && con.conType != ConnectionTypes.PRE_STATUS
+                                                && con.conType != ConnectionTypes.STATUS){
+                                            // send a keepalive
+                                            con.sendKeepAlive();
+                                        }
 
                                     }
 
