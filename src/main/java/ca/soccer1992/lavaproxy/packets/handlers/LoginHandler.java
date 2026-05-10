@@ -10,6 +10,7 @@ import ca.soccer1992.lavaproxy.packets.readers.ConfigReader;
 import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
 import ca.soccer1992.lavaproxy.packets.server.LoginAck;
 import ca.soccer1992.lavaproxy.packets.server.LoginStart;
+import ca.soccer1992.lavaproxy.packets.server.PluginResponse;
 
 
 public class LoginHandler extends Handler{
@@ -73,7 +74,10 @@ public class LoginHandler extends Handler{
             return true;
         }
 
-
+        if (p instanceof PluginResponse){
+            c.backendConnection.writePacketServer(p);
+            return true;
+        }
         return false;
     }
 }
