@@ -294,12 +294,11 @@ public class Connection {
         } catch (Exception e){
             close();
         }
-
+        if (backendConnection != null && !backendConnection.hasDisconnected && !backendConnection.isClosed && !isBackend) backendConnection.close();
 
         if (nolog) return;
         System.out.println(fillPlaceholders(Main.translations.get("log.disconnect"), plain(reason), plr.brand));
         //System.out.printf("%s has disconnected for: %s%n",plr,PlainTextComponentSerializer.plainText().serialize(reason));
-        if (backendConnection != null && !backendConnection.hasDisconnected && !backendConnection.isClosed && !isBackend) backendConnection.close();
     }
     public void close(){
 
@@ -312,15 +311,21 @@ public class Connection {
     public ByteBuf readPacket(){
         if (isClosed) return null;
         try {
-            heldData.discardReadBytes(); // compact first
             heldData.markReaderIndex();
 
             if (heldData.readableBytes() < 1) return null;
 
-            int len = readVarInt(heldData);
-
-            if (len > heldData.readableBytes()){
+            int len;
+            try {
+                len = readVarInt(heldData);
+            } catch (IndexOutOfBoundsException e) {
                 heldData.resetReaderIndex();
+                return null;
+            }
+
+            if (heldData.readableBytes() < len) {
+                heldData.resetReaderIndex();
+                heldData.discardReadBytes(); // compact first ( here to prevent eating memory )
                 return null;
             }
             return heldData.readBytes(len);

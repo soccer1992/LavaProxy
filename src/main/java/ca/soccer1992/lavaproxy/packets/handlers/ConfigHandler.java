@@ -35,7 +35,7 @@ public class ConfigHandler extends Handler{
                 return true;
             }
             c.backendConnection.writePacket(new FinishConfiguration());
-            PlayHandler.handlePlay(c);
+            PlayHandler.handlePlay(c, true);
 
             return true;
         }

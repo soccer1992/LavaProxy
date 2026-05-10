@@ -31,6 +31,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
                 con.backendConnection.close();
             }
         }
+        
         ctx.fireChannelInactive();
     }
     @Override
@@ -72,6 +73,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
 
             }
         } catch (Exception e){
+            if (read != null && read.refCnt() != 0) read.release();
             con.disconnect(Component.text(e.toString()), true);
         } finally{
             in.release();

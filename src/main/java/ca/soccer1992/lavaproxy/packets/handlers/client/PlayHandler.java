@@ -16,7 +16,6 @@ public class PlayHandler extends Handler {
             c._dimensionName = packet.dimension;
             c.backendConnection.writePacket(packet);
             System.out.println(c.backendConnection.fillPlaceholders(Main.translations.get("log.connected"), "", c.backendConnection.plr.brand));
-
             //c._dimInfo = c._dimensionCodec.getCompoundTag(packet.dimension);
             //System.out.println(c._dimInfo);
             //c.backendConnection.backendDisconnect(ComponentUtils.parser.deserialize("<rainbow>Simulation distance: " + packet.simDist + "</rainbow><br>" + c._dimensionName));

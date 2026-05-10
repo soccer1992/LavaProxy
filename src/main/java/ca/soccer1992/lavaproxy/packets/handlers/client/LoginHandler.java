@@ -1,6 +1,7 @@
 package ca.soccer1992.lavaproxy.packets.handlers.client;
 
 import ca.soccer1992.lavaproxy.Connection;
+import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
@@ -16,6 +17,9 @@ import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
 import ca.soccer1992.lavaproxy.packets.server.LoginAck;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+
+import java.util.Arrays;
+
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.writeString;
 
 public class LoginHandler extends Handler {
@@ -41,6 +45,9 @@ public class LoginHandler extends Handler {
                 c.conType = ConnectionTypes.PLAY;
                 c.setReader(new PlayReader());
                 //return true;
+                c.backendConnection.tryIter = Arrays.stream(Main.trys).iterator();
+                if (Main.trys[0].equals(c.backendConnection.connectedServer)) c.backendConnection.tryIter.next();
+                c.backendConnection._recentDisconnectMessage = null;
             }
 
             if (c.protocol.getProtocol()>= MinecraftVersions.MINECRAFT_1_20_2.getProtocol()) {

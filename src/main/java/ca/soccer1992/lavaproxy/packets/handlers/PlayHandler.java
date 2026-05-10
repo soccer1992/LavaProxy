@@ -14,14 +14,13 @@ import java.util.Arrays;
 
 public class PlayHandler extends Handler{
 
-    public static void handlePlay(Connection c){
+    public static void handlePlay(Connection c, boolean modifyBackendConnection){
         c.conType = ConnectionTypes.PLAY;
         c.setReader(new PlayReader());
         c.setHandler(new PlayHandler());
 
-        c.backendConnection.setReader(new PlayReader());
-
-        c.backendConnection.setHandler(new ca.soccer1992.lavaproxy.packets.handlers.client.PlayHandler());
+        if (modifyBackendConnection) c.backendConnection.setReader(new PlayReader());
+        if (modifyBackendConnection) c.backendConnection.setHandler(new ca.soccer1992.lavaproxy.packets.handlers.client.PlayHandler());
         c.tryIter = Arrays.stream(Main.trys).iterator();
         if (Main.trys[0].equals(c.connectedServer)) c.tryIter.next();
         c._recentDisconnectMessage = null;
