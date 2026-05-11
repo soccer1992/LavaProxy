@@ -36,7 +36,7 @@ public class NettyServer {
                     });
 
             ChannelFuture future = bootstrap.bind(port).sync();
-            Main.LOGGER.info("Server started on port {}", port);
+            System.out.printf("[Main] Server started on port %s%n", port);
 
             future.channel().closeFuture().sync();
         } finally {

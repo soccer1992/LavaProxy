@@ -6,13 +6,12 @@ import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.types.Identifier;
 import ca.soccer1992.lavaproxy.types.RegistryPart;
 import io.netty.buffer.ByteBuf;
-import net.querz.nbt.io.NamedTag;
-import net.querz.nbt.tag.CompoundTag;
+import net.kyori.adventure.nbt.BinaryTag;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
-import static ca.soccer1992.lavaproxy.utils.NBTUtil.*;
 public class RegistryData extends Packet {
     public Map<Integer, RegistryPart> RegistryData;
     public Identifier id;
@@ -25,10 +24,8 @@ public class RegistryData extends Packet {
         int length = readVarInt(buf);
         for (int i=0; i< length ; i++){
             String name =  readString(buf);
-            NamedTag nbt = buf.readBoolean() ? streamAuto(buf, proto) : null;
-            CompoundTag cTag = null;
-            if (nbt != null) cTag = (CompoundTag) nbt.getTag();
-            RegistryData.put(i, new RegistryPart(name, cTag, i, cTag != null));
+            BinaryTag nbt = buf.readBoolean() ? readTag(buf, proto) : null;
+            RegistryData.put(i, new RegistryPart(name, nbt, i, nbt != null));
         }
     }
     public void encode(ByteBuf buf, MinecraftVersions proto){

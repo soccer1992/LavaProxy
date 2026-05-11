@@ -17,7 +17,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import net.kyori.adventure.text.Component;
-import net.querz.nbt.tag.CompoundTag;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.*;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
@@ -25,7 +24,7 @@ import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.*;
-
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 public class Connection {
     private final Channel nChannel;
     public MinecraftVersions protocol;
@@ -46,8 +45,8 @@ public class Connection {
     public String _dimensionName = null;
     public Map<String, Integer> _dimensionMap = null;
     public Map<Long, Long> keepAliveList = new HashMap<>();
-    public CompoundTag _dimensionCodec = null;
-    public CompoundTag _dimInfo = null;
+    public CompoundBinaryTag _dimensionCodec = null;
+    public CompoundBinaryTag _dimInfo = null;
     public Component _recentDisconnectMessage;
     public Iterator<String> tryIter = Arrays.stream(Main.trys).iterator();
     public void setCompression(int amt){
@@ -285,7 +284,7 @@ public class Connection {
                 case ConnectionTypes.CONFIG, ConnectionTypes.PLAY:
                     NBTKick nKick = new NBTKick();
 
-                    nKick.setReason(nbt(reason));
+                    nKick.setReason(nbt(reason,protocol));
 
                     writePacket(nKick);
                     //close();

@@ -1,4 +1,4 @@
-package ca.soccer1992.lavaproxy.packets.client;
+package ca.soccer1992.lavaproxy.packets.client.login;
 
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;

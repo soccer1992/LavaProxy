@@ -1,6 +1,18 @@
 package ca.soccer1992.lavaproxy.utils;
 
+import ca.soccer1992.lavaproxy.MinecraftVersions;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.codec.EncoderException;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagType;
+import net.kyori.adventure.nbt.BinaryTagTypes;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.json.JSONOptions;
+import net.kyori.option.OptionSchema;
+import net.kyori.adventure.text.serializer.json.legacyimpl.NBTLegacyHoverEventSerializer;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -8,8 +20,132 @@ import java.util.UUID;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 public class PacketHelpers {
+    private static final GsonComponentSerializer PRE_1_16_SERIALIZER =
+            GsonComponentSerializer.colorDownsamplingGson().toBuilder()
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                    .options(
+                            OptionSchema.globalSchema().stateBuilder()
+                                    // general options
+                                    .value(JSONOptions.EMIT_CLICK_URL_HTTPS, Boolean.TRUE)
+                                    // before 1.16
+                                    .value(JSONOptions.EMIT_RGB, Boolean.FALSE)
+                                    .value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.VALUE_FIELD)
+                                    .value(JSONOptions.EMIT_CLICK_EVENT_TYPE, JSONOptions.ClickEventValueMode.CAMEL_CASE)
+                                    // before 1.20.3
+                                    .value(JSONOptions.EMIT_COMPACT_TEXT_COMPONENT, Boolean.FALSE)
+                                    .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, Boolean.FALSE)
+                                    .value(JSONOptions.VALIDATE_STRICT_EVENTS, Boolean.FALSE)
+                                    // before 1.21.5
+                                    .value(JSONOptions.EMIT_CHANGE_PAGE_CLICK_EVENT_PAGE_AS_STRING, Boolean.TRUE)
+                                    .build()
+                    )
+                    .build();
+    private static final GsonComponentSerializer PRE_1_20_3_SERIALIZER =
+            GsonComponentSerializer.builder()
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                    .options(
+                            OptionSchema.globalSchema().stateBuilder()
+                                    // general options
+                                    .value(JSONOptions.EMIT_CLICK_URL_HTTPS, Boolean.TRUE)
+                                    // after 1.16
+                                    .value(JSONOptions.EMIT_RGB, Boolean.TRUE)
+                                    .value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.CAMEL_CASE)
+                                    .value(JSONOptions.EMIT_CLICK_EVENT_TYPE, JSONOptions.ClickEventValueMode.CAMEL_CASE)
+                                    .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_KEY_AS_TYPE_AND_UUID_AS_ID, true)
+                                    // before 1.20.3
+                                    .value(JSONOptions.EMIT_COMPACT_TEXT_COMPONENT, Boolean.FALSE)
+                                    .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, Boolean.FALSE)
+                                    .value(JSONOptions.VALIDATE_STRICT_EVENTS, Boolean.FALSE)
+                                    // before 1.21.5
+                                    .value(JSONOptions.EMIT_CHANGE_PAGE_CLICK_EVENT_PAGE_AS_STRING, Boolean.TRUE)
+                                    .build()
+                    )
+                    .build();
+    private static final GsonComponentSerializer PRE_1_21_5_SERIALIZER =
+            GsonComponentSerializer.builder()
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                    .options(
+                            OptionSchema.globalSchema().stateBuilder()
+                                    // general options
+                                    .value(JSONOptions.EMIT_CLICK_URL_HTTPS, Boolean.TRUE)
+                                    // after 1.16
+                                    .value(JSONOptions.EMIT_RGB, Boolean.TRUE)
+                                    .value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.CAMEL_CASE)
+                                    .value(JSONOptions.EMIT_CLICK_EVENT_TYPE, JSONOptions.ClickEventValueMode.CAMEL_CASE)
+                                    .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_KEY_AS_TYPE_AND_UUID_AS_ID, true)
+                                    // after 1.20.3
+                                    .value(JSONOptions.EMIT_COMPACT_TEXT_COMPONENT, Boolean.TRUE)
+                                    .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, Boolean.TRUE)
+                                    .value(JSONOptions.VALIDATE_STRICT_EVENTS, Boolean.TRUE)
+                                    // before 1.21.5
+                                    .value(JSONOptions.EMIT_CHANGE_PAGE_CLICK_EVENT_PAGE_AS_STRING, Boolean.TRUE)
+                                    .build()
+                    )
+                    .build();
+    private static final GsonComponentSerializer MODERN_SERIALIZER =
+            GsonComponentSerializer.builder()
+                    .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
+                    .options(
+                            OptionSchema.globalSchema().stateBuilder()
+                                    // general options
+                                    .value(JSONOptions.EMIT_CLICK_URL_HTTPS, Boolean.TRUE)
+                                    // after 1.16
+                                    .value(JSONOptions.EMIT_RGB, Boolean.TRUE)
+                                    .value(JSONOptions.EMIT_HOVER_EVENT_TYPE, JSONOptions.HoverEventValueMode.SNAKE_CASE)
+                                    .value(JSONOptions.EMIT_CLICK_EVENT_TYPE, JSONOptions.ClickEventValueMode.SNAKE_CASE)
+                                    // after 1.20.3
+                                    .value(JSONOptions.EMIT_COMPACT_TEXT_COMPONENT, Boolean.TRUE)
+                                    .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_ID_AS_INT_ARRAY, Boolean.TRUE)
+                                    // after 1.21.5
+                                    .value(JSONOptions.EMIT_HOVER_SHOW_ENTITY_KEY_AS_TYPE_AND_UUID_AS_ID, Boolean.FALSE)
+                                    .value(JSONOptions.VALIDATE_STRICT_EVENTS, Boolean.TRUE)
+                                    .value(JSONOptions.EMIT_CHANGE_PAGE_CLICK_EVENT_PAGE_AS_STRING, Boolean.FALSE)
+                                    .build()
+                    )
+                    .build();
+
     private static final int SEGMENT_BITS = 0x7F;
     private static final int CONTINUE_BIT = 0x80;
+    @SuppressWarnings("unchecked")
+    private static final BinaryTagType<? extends BinaryTag>[] BINARY_TAG_TYPES = new BinaryTagType[] {
+            BinaryTagTypes.END, BinaryTagTypes.BYTE, BinaryTagTypes.SHORT, BinaryTagTypes.INT,
+            BinaryTagTypes.LONG, BinaryTagTypes.FLOAT, BinaryTagTypes.DOUBLE,
+            BinaryTagTypes.BYTE_ARRAY, BinaryTagTypes.STRING, BinaryTagTypes.LIST,
+            BinaryTagTypes.COMPOUND, BinaryTagTypes.INT_ARRAY, BinaryTagTypes.LONG_ARRAY};
+    public static GsonComponentSerializer serializerForVersion(MinecraftVersions ver){
+        if (ver.isGreaterEquals(MinecraftVersions.MINECRAFT_1_21_5)) return MODERN_SERIALIZER;
+        if (ver.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_3)) return PRE_1_21_5_SERIALIZER;
+        if (ver.isGreaterEquals(MinecraftVersions.MINECRAFT_1_16)) return PRE_1_20_3_SERIALIZER;
+        return PRE_1_16_SERIALIZER;
+    }
+    public static BinaryTag readTag(ByteBuf buf, MinecraftVersions ver){
+        BinaryTagType<? extends BinaryTag> type = BINARY_TAG_TYPES[buf.readByte()];
+
+        if (ver.isLess(MinecraftVersions.MINECRAFT_1_20_2)){
+            // skip name data
+            buf.skipBytes(buf.readUnsignedShort());
+        }
+        // We can read NBT as a 1.20.2+ NBT, even on <1.20.2!
+        try{
+            return type.read(new ByteBufInputStream(buf));
+        } catch (IOException exception){
+            throw new DecoderException("Failed reading NBT: " + exception.getMessage());
+        }
+    }
+    public static void writeTag(ByteBuf buf, MinecraftVersions ver, BinaryTag tag){
+        BinaryTagType type = tag.type();
+        buf.writeByte(type.id());
+        try {
+            if (ver.isLess(MinecraftVersions.MINECRAFT_1_20_2)) {
+                // skip name data
+                buf.writeShort(0); // unsigned short (no-name)
+            }
+            type.write(tag, new ByteBufOutputStream(buf));
+        } catch (IOException e){
+            throw new EncoderException("Failed encoding NBT: " + e.getMessage());
+        }
+
+    }
     public static long readVarLong(ByteBuf buf) {
         int read = buf.readableBytes();
         if (read == 0) {

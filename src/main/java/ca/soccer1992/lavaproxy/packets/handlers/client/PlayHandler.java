@@ -8,6 +8,8 @@ import ca.soccer1992.lavaproxy.packets.client.play.*;
 import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.handlers.Handler;
+import net.kyori.adventure.text.Component;
+
 public class PlayHandler extends Handler {
 
     public boolean handle(Packet p, Connection c) {
@@ -16,12 +18,17 @@ public class PlayHandler extends Handler {
             c._dimensionName = packet.dimension;
             c.backendConnection.writePacket(packet);
             System.out.println(c.backendConnection.fillPlaceholders(Main.translations.get("log.connected"), "", c.backendConnection.plr.brand));
+            c.backendConnection.plr.sendMessage(Component.text("if you see this, it worked."),false);
             //c._dimInfo = c._dimensionCodec.getCompoundTag(packet.dimension);
             //System.out.println(c._dimInfo);
             //c.backendConnection.backendDisconnect(ComponentUtils.parser.deserialize("<rainbow>Simulation distance: " + packet.simDist + "</rainbow><br>" + c._dimensionName));
             return true;
         }
         if (p instanceof PluginMessage packet) {
+            c.backendConnection.writePacket(packet);
+            return true;
+        }
+        if (p instanceof SystemChat packet){
             c.backendConnection.writePacket(packet);
             return true;
         }

@@ -74,6 +74,18 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x20)
 
             ),
+            SystemChat.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x5F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x62),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x60),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x64),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x67),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_3, 0x69),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x6C),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x73),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x72),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x77)
+            ),
             ClientInfo.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x15),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x4),

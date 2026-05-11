@@ -17,7 +17,8 @@ import ca.soccer1992.lavaproxy.packets.server.FeatureFlags;
 import ca.soccer1992.lavaproxy.types.RegistryPart;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.querz.nbt.tag.CompoundTag;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class ConfigHandler extends Handler {
         //System.out.println(c.hasDisconnected);
         if (p instanceof final NBTKick packet){
             try {
-                backendConnection.backendDisconnect(fromJSON(packet.reasonJSON()));
+                backendConnection.backendDisconnect(fromJSON(packet.reasonJSON().toString()));
             } catch (Exception e){
                 backendConnection.disconnect(e.toString(), true);
             }
@@ -48,20 +49,20 @@ public class ConfigHandler extends Handler {
         }
         if (p instanceof final RegistryData packet){
             if (Objects.equals(packet.id.name(), "dimension_type")){
-                CompoundTag codec = new CompoundTag();
+                CompoundBinaryTag.Builder codec = CompoundBinaryTag.builder();
                 Map<String, Integer> dimMap = new HashMap<>();
                 for (RegistryPart part : packet.RegistryData.values()){
                     if (!part.hasNBT()){
                         continue;
                         //throw new IllegalArgumentException("dimension_type does not have NBT attached to RegistryPart");
                     }
-                    CompoundTag t = part.nbt();
+                    BinaryTag t = part.nbt();
                     codec.put(part.entry(),t); // confirmed to have nbt
                     dimMap.put(part.entry(), part.id());
 
                 }
                 c._dimensionMap = dimMap;
-                c._dimensionCodec = codec;
+                c._dimensionCodec = codec.build();
             }
             backendConnection.writePacket(packet);
             return true;

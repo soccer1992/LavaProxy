@@ -5,7 +5,7 @@ import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
-import ca.soccer1992.lavaproxy.packets.client.PluginRequest;
+import ca.soccer1992.lavaproxy.packets.client.login.PluginRequest;
 import ca.soccer1992.lavaproxy.packets.client.login.CompressionPacket;
 import ca.soccer1992.lavaproxy.packets.client.login.LoginKick;
 import ca.soccer1992.lavaproxy.packets.client.login.LoginSuccess;

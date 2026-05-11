@@ -1,7 +1,10 @@
 package ca.soccer1992.lavaproxy;
 
+import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
+import ca.soccer1992.lavaproxy.packets.client.play.SystemChat;
 import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
 import ca.soccer1992.lavaproxy.types.KnownPack;
+import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -18,6 +21,15 @@ public class Player {
     public void setKnownPacks(ArrayList<KnownPack> knownPack){
         this.knownPacks = knownPack;
 
+    }
+    public void sendMessage(Component msg, boolean isActionBar){
+        SystemChat chat = new SystemChat();
+        chat.message = msg;
+        chat.isActionBar = isActionBar;
+        if (con.isBackend) throw new IllegalArgumentException("Cannot sendMessage on a backend connection!");
+        if (con.conType != ConnectionTypes.PLAY) throw new IllegalArgumentException("Cannot sendMessage on a non-play connection!");
+
+        con.writePacket(chat);
     }
 
     public void setUUID(UUID uuid){
