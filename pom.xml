@@ -74,7 +74,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.2.1.Final</version>
+            <version>4.2.13.Final</version>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
@@ -106,9 +106,9 @@
             <version>2.13.2</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.25.2</version>
+            <groupId>com.moandjiezana.toml</groupId>
+            <artifactId>toml4j</artifactId>
+            <version>0.7.2</version>
         </dependency>
     </dependencies>
 

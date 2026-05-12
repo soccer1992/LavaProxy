@@ -22,6 +22,7 @@ public class Player {
         this.knownPacks = knownPack;
 
     }
+
     public void sendMessage(Component msg, boolean isActionBar){
         SystemChat chat = new SystemChat();
         chat.message = msg;

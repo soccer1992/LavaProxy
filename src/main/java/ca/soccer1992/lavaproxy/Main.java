@@ -1,20 +1,18 @@
 package ca.soccer1992.lavaproxy;
+import com.moandjiezana.toml.Toml;
 import io.netty.util.AttributeKey;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.*;
 
 
 public class Main {
-    public static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static final AttributeKey<Connection> READER =
             AttributeKey.valueOf("connection");
     public static final AttributeKey<Connection> BACKEND =
             AttributeKey.valueOf("backend");
-    public static final String[] trys = new String[]{"lobby"};
+    public static String[] trys = null;
     public static final HashMap<String, String> translations = new HashMap<>();
 
     public static final HashMap<String, ArrayList<Object>> servers = new HashMap<>();
@@ -23,17 +21,56 @@ public class Main {
     public static int CON_AMOUNT = 0;
 
     public static void main(String[] args) throws Exception {
-        servers.put("lobby", new ArrayList<>(List.of("127.0.0.1",25565)));
         translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
         translations.put("log.ping","{ip} has pinged");
         translations.put("backend.transfer","{player} is getting transfered to: {host}:{port}");
         translations.put("log.connect","{player} ({ipHost}) has started login.");
-        translations.put("log.connected","{player} has connected to {serverName}");
+        translations.put("log.connected","{player} has connected to {serverName}.");
         translations.put("error.unsupported","<red>Your protocol is too old/new for LavaProxy.</red>");
         translations.put("log.disconnect","{player} has disconnected for: {message}");
         translations.put("log.brand","{player} brand: {brand}");
         translations.put("backend.disconnect","{player} has disconnected from {serverName}: {message}");
         translations.put("backend.brand","{backendBrand} [LavaProxy]");
+        File config = new File("config.toml");
+        if (!config.exists()) {
+            Files.writeString(config.toPath(), """
+            tries = ["lobby"]
+            
+            [servers]
+            lobby = "localhost:25565"
+            """);
+        }
+        Toml toml = new Toml().read(config);
+
+        trys = toml.getList("tries").toArray(new String[0]);
+        Map<String, Object> servs = toml.getTable("servers").toMap();
+        for (String i : servs.keySet()){
+            String ip = toml.getTable("servers").getString(i);
+            if (ip.split(":").length > 2){
+                System.out.printf("Error loading server %s: Invalid IP%n", i);
+                continue;
+            }
+            String[] ipport = ip.split(":");
+            String port = ipport.length == 2 ? ipport[1] : "25565";
+            boolean isPort = port.matches("\\d+") && Integer.parseInt(port) <= 65535;
+            if (!isPort){
+                System.out.printf("Error loading server %s: Invalid Port%n", i);
+                continue;
+            }
+            servers.put(i, new ArrayList<>(List.of(ipport[0],Integer.parseInt(port))));
+        }
+        ArrayList<String> newTrys = new ArrayList<>();
+        for (String i : trys){
+            if (servers.containsKey(i)) {
+                newTrys.add(i);
+            } else {
+                System.out.printf("[WARN] Server %s does not exist, try will not be used.%n",i);
+            }
+
+        }
+        trys = newTrys.toArray(String[]::new);
+        if (trys.length == 0) System.out.println("[WARN] No tries loaded, connections will fail!");
+        if (servers.isEmpty()) System.out.println("[WARN] No servers loaded, connections will fail!");
 
         //System.out.println(root.value.values());
         //root = new CompoundTag("root");
