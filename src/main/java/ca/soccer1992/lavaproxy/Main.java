@@ -16,8 +16,8 @@ public class Main {
     public static final HashMap<String, String> translations = new HashMap<>();
 
     public static final HashMap<String, ArrayList<Object>> servers = new HashMap<>();
-    public static boolean logErrors = true;
-    public static boolean logPings = true;
+    public static boolean logErrors;
+    public static boolean logPings;
     public static int CON_AMOUNT = 0;
 
     public static void main(String[] args) throws Exception {
@@ -38,10 +38,15 @@ public class Main {
             
             [servers]
             lobby = "localhost:25565"
+            [logging]
+            errors = false
+            pings = true
             """);
         }
         Toml toml = new Toml().read(config);
-
+        Toml logging = toml.getTable("logging");
+        logErrors = logging.getBoolean("errors");
+        logPings = logging.getBoolean("pings");
         trys = toml.getList("tries").toArray(new String[0]);
         Map<String, Object> servs = toml.getTable("servers").toMap();
         for (String i : servs.keySet()){
