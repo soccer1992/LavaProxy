@@ -8,7 +8,7 @@ import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
-import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
+import ca.soccer1992.lavaproxy.packets.server.*;
 
 import java.util.Arrays;
 
@@ -23,6 +23,9 @@ public class PlayHandler extends Handler{
         if (modifyBackendConnection) c.backendConnection.setHandler(new ca.soccer1992.lavaproxy.packets.handlers.client.PlayHandler());
         c.tryIter = Arrays.stream(Main.trys).iterator();
         if (Main.trys[0].equals(c.connectedServer)) c.tryIter.next();
+        if (c._recentDisconnectMessage != null){
+            c.plr.sendMessage(c._recentDisconnectMessage, false);
+        }
         c._recentDisconnectMessage = null;
         //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Connected to " + c.connectedServer + "</rainbow>"), false);
     }
@@ -30,6 +33,29 @@ public class PlayHandler extends Handler{
         //System.out.printf("[IN] " + p.getClass().getSimpleName() + " ");
 
         if (c.backendConnection == null) return true;
+        if (p instanceof UnsignedChat packet){
+            if (packet.msg.startsWith("/")){
+                if (!c.plr.executeCommand(packet.msg.substring(1))) c.backendConnection.writePacketServer(packet);
+            } else {
+                c.backendConnection.writePacketServer(packet);
+            }
+            return true;
+        }
+        if (p instanceof UnsignedCommand packet){
+            if (!c.plr.executeCommand(packet.msg)) c.backendConnection.writePacketServer(packet);
+
+            return true;
+        }
+        if (p instanceof SignedCommand packet){
+            if (!c.plr.executeCommand(packet.msg)) c.backendConnection.writePacketServer(packet);
+
+            return true;
+        }
+        if (p instanceof ChatCommand packet){
+            if (!c.plr.executeCommand(packet.msg)) c.backendConnection.writePacketServer(packet);
+
+            return true;
+        }
         if (p instanceof ClientInfo packet) {
             c.plr.setInfo(packet);
             c.backendConnection.writePacketServer(packet);

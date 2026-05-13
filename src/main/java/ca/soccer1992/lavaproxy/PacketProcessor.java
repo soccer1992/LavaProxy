@@ -2,7 +2,6 @@ package ca.soccer1992.lavaproxy;
 
 import ca.soccer1992.lavaproxy.packets.Packet;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import net.kyori.adventure.text.Component;
@@ -56,7 +55,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
                         read.readBytes(tmp);
                         byte[] decompressed = decompress(tmp, compLength);
                         read.release();
-                        read = Unpooled.buffer();
+                        read = ctx.alloc().buffer();
                         read.writeBytes(decompressed);
                     }
 

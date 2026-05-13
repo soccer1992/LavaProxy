@@ -7,6 +7,7 @@ import ca.soccer1992.lavaproxy.packets.client.*;
 import ca.soccer1992.lavaproxy.packets.client.play.*;
 import ca.soccer1992.lavaproxy.packets.clientserver.*;
 import ca.soccer1992.lavaproxy.packets.server.*;
+import ca.soccer1992.lavaproxy.packets.server.UnsignedChat;
 
 import java.util.List;
 import java.util.Map;
@@ -52,9 +53,42 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x18),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x1A),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x1B)
+            ),
+            UnsignedChat.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x01),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x02),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12, 0x03),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12_1, 0x02),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_14, 0x03),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, -1)
+            ),
+            ChatCommand.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x03),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x04),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3   , -1)
+            ),
+            SignedCommand.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x04),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x05),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x06),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x07)
+            ),
+            UnsignedCommand.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x04),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x05),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x06)
             )
     );
     public Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of(
+            ca.soccer1992.lavaproxy.packets.client.UnsignedChat.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_8, 0x02),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x0F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_13, 0x0E),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_15, 0x0F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_16, 0x0E),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_17, 0x0F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, -1)
+            ),
             NBTKick.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_8, 0x40),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x1a),
@@ -74,6 +108,7 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x20)
 
             ),
+
             SystemChat.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x5F),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x62),

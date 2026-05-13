@@ -106,6 +106,9 @@ public class PacketHelpers {
 
     private static final int SEGMENT_BITS = 0x7F;
     private static final int CONTINUE_BIT = 0x80;
+    public static final int MAX_PACKET_SIZE = 2 * 1024 * 1024;
+    public static final int MAX_BUF_SIZE = 2 * 1024 * 1024;
+
     @SuppressWarnings("unchecked")
     private static final BinaryTagType<? extends BinaryTag>[] BINARY_TAG_TYPES = new BinaryTagType[] {
             BinaryTagTypes.END, BinaryTagTypes.BYTE, BinaryTagTypes.SHORT, BinaryTagTypes.INT,
@@ -284,7 +287,22 @@ public class PacketHelpers {
         return new UUID(buf.readLong(), buf.readLong());
 
     }
-
+    public static void writeFixedBitSet(ByteBuf buf, boolean[] bits, int n) {
+        byte[] bytes = new byte[(n + 7) / 8];
+        for (int i = 0; i < n; i++) {
+            if (bits[i]) bytes[i / 8] |= (byte) (1 << (i % 8));
+        }
+        buf.writeBytes(bytes);
+    }
+    public static boolean[] readFixedBitSet(ByteBuf buf, int n) {
+        byte[] bytes = new byte[(n + 7) / 8];
+        buf.readBytes(bytes);
+        boolean[] bits = new boolean[n];
+        for (int i = 0; i < n; i++) {
+            bits[i] = (bytes[i / 8] & (1 << (i % 8))) != 0;
+        }
+        return bits;
+    }
     public static void writeVarLong(long value, ByteBuf os) {
 
         while (true) {

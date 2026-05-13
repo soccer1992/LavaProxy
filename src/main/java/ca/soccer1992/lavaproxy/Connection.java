@@ -35,7 +35,7 @@ public class Connection {
     public Handler packetHandler;
     public Player plr;
     public ConnectionTypes conType = ConnectionTypes.HANDSHAKE;
-    public ByteBuf heldData = Unpooled.buffer();
+    public ByteBuf heldData = null;
     public String connectedServer = null;
     public String lastServer = null;
     public Connection backendConnection = null;
@@ -47,6 +47,7 @@ public class Connection {
     public Map<Long, Long> keepAliveList = new HashMap<>();
     public CompoundBinaryTag _dimensionCodec = null;
     public CompoundBinaryTag _dimInfo = null;
+    public boolean isRetrying = false;
     public Component _recentDisconnectMessage;
     public Iterator<String> tryIter = Arrays.stream(Main.trys).iterator();
     public void setCompression(int amt){
@@ -93,15 +94,20 @@ public class Connection {
     }
 
     public void backendDisconnect(Component message){
+
         if (isBackend){
 
             backendConnection.backendDisconnect(message);
 
             return;
         }
+        if (isClosed || hasDisconnected) return;
+
         if (!backendConnection.isClosed){
             backendConnection.close();
         }
+        if (isRetrying) return;
+        isRetrying = true;
         backendConnection = null;
         _recentDisconnectMessage = parser.deserialize(fillPlaceholders(Main.translations.get("backend.player.disconnect"), miniMessage(message), plr.brand)); //Component.text("You have been disconnected from " + connectedServer + ": ").color(NamedTextColor.RED).append(message);
 
@@ -118,6 +124,7 @@ public class Connection {
         } else {
             String next = tryIter.next();
             connect(next);
+            isRetrying = false;
         }
 
     }
@@ -130,6 +137,7 @@ public class Connection {
         setReader(new HandshakeReader());
         setHandler(new HandshakeHandler());
         this.plr = new Player(this);
+        heldData = nChannel.alloc().buffer();
 
     }
     public void setHandler(Handler r){
@@ -159,7 +167,19 @@ public class Connection {
         setProtocol(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(proto));
     }
     public void addToHeld(ByteBuf buf){
+        if (buf.readableBytes() > MAX_BUF_SIZE) {
+            close();
+            return;
+        }
+
+        if (heldData.readableBytes() + buf.readableBytes() > MAX_BUF_SIZE) {
+            close();
+            return;
+        }
         heldData.writeBytes(buf);
+        if (heldData.readableBytes() > MAX_BUF_SIZE / 2) {
+            nChannel.config().setAutoRead(false);
+        }
     }
 
     public Packet processPacket(ByteBuf p, boolean forceClient) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -173,26 +193,34 @@ public class Connection {
         return protoReader.read(p, protocol.getProtocol(),forceClient);
     }
     public void writePacket(Packet p){
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = nChannel.alloc().buffer();
         int cID = protoReader.getPacketFromInfoClient(protocol, p.getClass());
         if (p instanceof InvalidPacket packet){
             cID = packet.id;
         }
-        if (cID == 0xffff) return;
+        if (cID == 0xffff) {
+            buf.release();
+            return;
+        }
         writeVarInt(cID, buf);
         _writePacket(p, buf);
+        buf.release();
     }
     public void writePacketServer(Packet p){
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = nChannel.alloc().buffer();
         //System.out.println(protoReader.getPacketFromInfo(protocol, p.getClass()));
 
         int cID = protoReader.getPacketFromInfo(protocol, p.getClass());
         if (p instanceof InvalidPacket packet){
             cID = packet.id;
         }
-        if (cID == 0xffff) return;
+        if (cID == 0xffff) {
+            buf.release();
+            return;
+        }
         writeVarInt(cID, buf);
         _writePacket(p, buf);
+        buf.release();
 
     }
     public void sendCompression(int threshold){
@@ -204,7 +232,7 @@ public class Connection {
     public void _writePacket(Packet p, ByteBuf buf){
         if (isClosed) return;
         p.encode(buf, protocol);
-        ByteBuf compressedRewritten = Unpooled.buffer();
+        ByteBuf compressedRewritten = nChannel.alloc().buffer();
 
         if (compressionAmount>=0){
 
@@ -214,6 +242,7 @@ public class Connection {
                 buf.getBytes(buf.readerIndex(), e);
                 byte[] compressed = compress(e);
                 if (compressed == null){
+                    compressedRewritten.release();
                     close();
                     return;
                 }
@@ -229,10 +258,10 @@ public class Connection {
         } else        compressedRewritten.writeBytes(buf, buf.readerIndex(), buf.readableBytes());
         //System.out.println(compressedRewritten.toString(StandardCharsets.UTF_8));
 
-        ByteBuf rewritten14 = Unpooled.buffer();
+        ByteBuf rewritten14 = nChannel.alloc().buffer();
         writeVarInt(compressedRewritten.readableBytes(), rewritten14);
         rewritten14.writeBytes(compressedRewritten, 0, compressedRewritten.readableBytes());
-
+        compressedRewritten.release();
         nChannel.writeAndFlush(rewritten14);
 
     }
@@ -321,11 +350,18 @@ public class Connection {
                 heldData.resetReaderIndex();
                 return null;
             }
+            if (len > MAX_PACKET_SIZE){
+                close();
+                return null;
+            }
 
             if (heldData.readableBytes() < len) {
                 heldData.resetReaderIndex();
                 heldData.discardReadBytes(); // compact first ( here to prevent eating memory )
                 return null;
+            }
+            if (heldData.readableBytes() < MAX_BUF_SIZE / 4) {
+                nChannel.config().setAutoRead(true);
             }
             return heldData.readBytes(len);
 

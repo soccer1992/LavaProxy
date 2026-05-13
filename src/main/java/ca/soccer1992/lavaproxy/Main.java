@@ -1,10 +1,14 @@
 package ca.soccer1992.lavaproxy;
+import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 import com.moandjiezana.toml.Toml;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.netty.util.AttributeKey;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Main {
@@ -14,12 +18,13 @@ public class Main {
             AttributeKey.valueOf("backend");
     public static String[] trys = null;
     public static final HashMap<String, String> translations = new HashMap<>();
+    public static CommandDispatcher<Player> dispatcher = new CommandDispatcher<>();
 
     public static final HashMap<String, ArrayList<Object>> servers = new HashMap<>();
     public static boolean logErrors;
     public static boolean logPings;
     public static int CON_AMOUNT = 0;
-
+    public static final Map<UUID, Player> players = new ConcurrentHashMap<>();
     public static void main(String[] args) throws Exception {
         translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
         translations.put("log.ping","{ip} has pinged");
@@ -76,7 +81,13 @@ public class Main {
         trys = newTrys.toArray(String[]::new);
         if (trys.length == 0) System.out.println("[WARN] No tries loaded, connections will fail!");
         if (servers.isEmpty()) System.out.println("[WARN] No servers loaded, connections will fail!");
-
+        dispatcher.register(
+                LiteralArgumentBuilder.<Player>literal("getkicked")
+                        .executes(ctx -> {
+                            ctx.getSource().con.disconnect(ComponentUtils.parser.deserialize("<green>yea, you got kicked...<newline>i dont really know what you were expecting"), false);
+                            return 1;
+                        })
+        );
         //System.out.println(root.value.values());
         //root = new CompoundTag("root");
         //root.put(new StringTag("name","hello"));

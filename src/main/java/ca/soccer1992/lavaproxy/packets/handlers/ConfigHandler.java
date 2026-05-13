@@ -35,6 +35,10 @@ public class ConfigHandler extends Handler{
                 c.disconnect("ConfigurationFinish sent before server ConfigurationFinish", true);
                 return true;
             }
+            // players
+            if (!Main.players.containsKey(c.plr.uuid)){
+                Main.players.put(c.plr.uuid, c.plr);
+            }
             c.backendConnection.writePacket(new FinishConfiguration());
             PlayHandler.handlePlay(c, true);
 

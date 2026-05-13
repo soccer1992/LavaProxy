@@ -80,7 +80,7 @@ public class NBTUtil {
                 cmp.keySet().forEach(k -> {
                     String realKey = k;
                     if (realKey.isEmpty() && fixEmptyKeys) realKey = "text";
-                    obj.add(realKey, deserialize(Objects.requireNonNull(cmp.get(realKey)), fixEmptyKeys)); /* recurse on value
+                    obj.add(realKey, deserialize(Objects.requireNonNull(cmp.get(k)), fixEmptyKeys)); /* recurse on array
                     (yea if the server sends a malformed payload this CAN StackOverflowException, but its very unlikely.)
                     */
 
