@@ -37,6 +37,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
 
         // replace the message
         ByteBuf read = (ByteBuf) msg;
+        ByteBuf release = read;
         Connection con = ctx.channel().attr(Main.READER).get();
         try {
             if (con.compressionAmount>-1){
@@ -46,9 +47,14 @@ public class PacketProcessor extends ChannelDuplexHandler {
                     byte[] tmp = new byte[read.readableBytes()];
                     read.readBytes(tmp);
                     byte[] decompressed = decompress(tmp, compLength);
+                    if (decompressed == null){
+                        con.close();
+                        return;
+                    }
                     read.release();
                     read = ctx.alloc().buffer();
                     read.writeBytes(decompressed);
+                    release = read;
                 }
             }
             Packet p = con.processPacket(read,client);
@@ -62,7 +68,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
         } catch (Exception e){
             con.disconnect(Component.text(e.toString()), true);
         } finally{
-            if (read.refCnt() > 0) read.release();
+            if (release.refCnt() > 0) release.release();
 
         }
     }
