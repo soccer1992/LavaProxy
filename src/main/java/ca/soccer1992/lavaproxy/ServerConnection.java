@@ -32,13 +32,18 @@ public class ServerConnection {
                             ch.attr(Main.BACKEND).set(con);
                             c.backendConnection = con;
                             con.backendConnection = c;
-                            ch.pipeline().addFirst(new PacketProcessor(true));
+                            String serverName = c.connectedServer;
+                            ch.pipeline().addFirst(new NettyFrameDecoder());
+
+                            ch.pipeline().addLast(new PacketProcessor(true));
 
                             ch.pipeline().addLast(new ServerHandler());
                             ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                                 @Override
                                 public void channelInactive(ChannelHandlerContext ctx){
-                                    if (con.backendConnection == c) { // only disconnect if still the active backend
+                                    //if (c.heldData.refCnt() > 0) c.heldData.release();
+
+                                    if (con.backendConnection == c && c.connectedServer != null && c.connectedServer.equals(serverName)) { // only disconnect if still the active backend
                                         c.backendConnection.backendDisconnect("Connection closed");
                                     }
                                     c.close();
@@ -84,7 +89,6 @@ public class ServerConnection {
 
                                 @Override
                                 public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-
                                     ctx.close();
                                 }
                             });

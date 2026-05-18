@@ -35,7 +35,6 @@ public class Connection {
     public Handler packetHandler;
     public Player plr;
     public ConnectionTypes conType = ConnectionTypes.HANDSHAKE;
-    public ByteBuf heldData = null;
     public String connectedServer = null;
     public String lastServer = null;
     public Connection backendConnection = null;
@@ -137,7 +136,6 @@ public class Connection {
         setReader(new HandshakeReader());
         setHandler(new HandshakeHandler());
         this.plr = new Player(this);
-        heldData = nChannel.alloc().buffer();
 
     }
     public void setHandler(Handler r){
@@ -165,21 +163,6 @@ public class Connection {
 
     public void setProtocol(int proto){
         setProtocol(MinecraftVersions.ID_TO_PROTOCOL_CONSTANT.get(proto));
-    }
-    public void addToHeld(ByteBuf buf){
-        if (buf.readableBytes() > MAX_BUF_SIZE) {
-            close();
-            return;
-        }
-
-        if (heldData.readableBytes() + buf.readableBytes() > MAX_BUF_SIZE) {
-            close();
-            return;
-        }
-        heldData.writeBytes(buf);
-        if (heldData.readableBytes() > MAX_BUF_SIZE / 2) {
-            nChannel.config().setAutoRead(false);
-        }
     }
 
     public Packet processPacket(ByteBuf p, boolean forceClient) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -329,46 +312,11 @@ public class Connection {
         //System.out.printf("%s has disconnected for: %s%n",plr,PlainTextComponentSerializer.plainText().serialize(reason));
     }
     public void close(){
-
         if (isClosed) return;
         isClosed = true;
         nChannel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
-        heldData.release();
-
     }
-    public ByteBuf readPacket(){
-        if (isClosed) return null;
-        try {
-            heldData.markReaderIndex();
 
-            if (heldData.readableBytes() < 1) return null;
-
-            int len;
-            try {
-                len = readVarInt(heldData);
-            } catch (IndexOutOfBoundsException e) {
-                heldData.resetReaderIndex();
-                return null;
-            }
-            if (len > MAX_PACKET_SIZE){
-                close();
-                return null;
-            }
-
-            if (heldData.readableBytes() < len) {
-                heldData.resetReaderIndex();
-                heldData.discardReadBytes(); // compact first ( here to prevent eating memory )
-                return null;
-            }
-            if (heldData.readableBytes() < MAX_BUF_SIZE / 4) {
-                nChannel.config().setAutoRead(true);
-            }
-            return heldData.readBytes(len);
-
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
 
 

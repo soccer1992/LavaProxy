@@ -29,7 +29,8 @@ public class NettyServer {
 
                             Main.CON_AMOUNT += 1;
                             ch.attr(Main.READER).set(new Connection(ch));
-                            ch.pipeline().addFirst(new PacketProcessor(false));
+                            ch.pipeline().addFirst(new NettyFrameDecoder());
+                            ch.pipeline().addLast(new PacketProcessor(false));
 
                             ch.pipeline().addLast(new ServerHandler());
                         }

@@ -30,52 +30,39 @@ public class PacketProcessor extends ChannelDuplexHandler {
                 con.backendConnection.close();
             }
         }
-        
         ctx.fireChannelInactive();
     }
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg){
 
         // replace the message
-        ByteBuf in = (ByteBuf) msg;
+        ByteBuf read = (ByteBuf) msg;
         Connection con = ctx.channel().attr(Main.READER).get();
-        con.addToHeld(in);
-        ByteBuf read = con.readPacket();
         try {
-            while (read != null) {
-
-
-                if (con.compressionAmount>-1){
-                    // check first varInt (0 = uncompressed, anything else = decompressed length)
-                    int compLength = readVarInt(read);
-                    if (compLength>0){
-
-
-                        byte[] tmp = new byte[read.readableBytes()];
-                        read.readBytes(tmp);
-                        byte[] decompressed = decompress(tmp, compLength);
-                        read.release();
-                        read = ctx.alloc().buffer();
-                        read.writeBytes(decompressed);
-                    }
-
+            if (con.compressionAmount>-1){
+                // check first varInt (0 = uncompressed, anything else = decompressed length)
+                int compLength = readVarInt(read);
+                if (compLength>0){
+                    byte[] tmp = new byte[read.readableBytes()];
+                    read.readBytes(tmp);
+                    byte[] decompressed = decompress(tmp, compLength);
+                    read.release();
+                    read = ctx.alloc().buffer();
+                    read.writeBytes(decompressed);
                 }
-                Packet p = con.processPacket(read,client);
-                read.release();
-                if (p == null) {
-                    // invalid packet
-                    ctx.close();
-                    return;
-                }
-                ctx.fireChannelRead(p);
-                read = con.readPacket();
-
             }
+            Packet p = con.processPacket(read,client);
+            if (p == null) {
+                // invalid packet
+                ctx.close();
+                return;
+            }
+            ctx.fireChannelRead(p);
+
         } catch (Exception e){
-            if (read != null && read.refCnt() != 0) read.release();
             con.disconnect(Component.text(e.toString()), true);
         } finally{
-            in.release();
+            if (read.refCnt() > 0) read.release();
 
         }
     }
