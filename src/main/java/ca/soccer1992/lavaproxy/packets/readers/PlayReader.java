@@ -7,7 +7,10 @@ import ca.soccer1992.lavaproxy.packets.client.*;
 import ca.soccer1992.lavaproxy.packets.client.play.*;
 import ca.soccer1992.lavaproxy.packets.clientserver.*;
 import ca.soccer1992.lavaproxy.packets.server.*;
-import ca.soccer1992.lavaproxy.packets.server.UnsignedChat;
+import ca.soccer1992.lavaproxy.packets.server.play.ChatCommand;
+import ca.soccer1992.lavaproxy.packets.server.play.SignedCommand;
+import ca.soccer1992.lavaproxy.packets.server.play.UnsignedChat;
+import ca.soccer1992.lavaproxy.packets.server.play.UnsignedCommand;
 
 import java.util.List;
 import java.util.Map;

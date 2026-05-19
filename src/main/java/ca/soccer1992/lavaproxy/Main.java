@@ -3,6 +3,8 @@ import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 import com.moandjiezana.toml.Toml;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
 
 import java.io.File;
@@ -19,6 +21,9 @@ public class Main {
     public static String[] trys = null;
     public static final HashMap<String, String> translations = new HashMap<>();
     public static CommandDispatcher<Player> dispatcher = new CommandDispatcher<>();
+    public static final EventLoopGroup nettyGroup = new NioEventLoopGroup();
+    public static final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
+    public static String motd;
 
     public static final HashMap<String, ArrayList<Object>> servers = new HashMap<>();
     public static boolean logErrors;
@@ -46,10 +51,14 @@ public class Main {
             [logging]
             errors = false
             pings = true
+            [settings]
+            motd = "A LavaProxy proxy.<newline>Total connections: {conAmount}"
             """);
         }
         Toml toml = new Toml().read(config);
         Toml logging = toml.getTable("logging");
+        Toml settings = toml.getTable("settings");
+        motd = settings.getString("motd");
         logErrors = logging.getBoolean("errors");
         logPings = logging.getBoolean("pings");
         trys = toml.getList("tries").toArray(new String[0]);
@@ -84,7 +93,7 @@ public class Main {
         dispatcher.register(
                 LiteralArgumentBuilder.<Player>literal("getkicked")
                         .executes(ctx -> {
-                            ctx.getSource().con.disconnect(ComponentUtils.parser.deserialize("<green>yea, you got kicked...<newline>i dont really know what you were expecting"), false);
+                            ctx.getSource().con.disconnect(ComponentUtils.parser.deserialize("<green>yea, you got kicked...<newline>i dont really know what you were expecting"), true);
                             return 1;
                         })
         );

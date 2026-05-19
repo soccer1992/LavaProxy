@@ -9,6 +9,10 @@ import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
 import ca.soccer1992.lavaproxy.packets.server.*;
+import ca.soccer1992.lavaproxy.packets.server.play.ChatCommand;
+import ca.soccer1992.lavaproxy.packets.server.play.SignedCommand;
+import ca.soccer1992.lavaproxy.packets.server.play.UnsignedChat;
+import ca.soccer1992.lavaproxy.packets.server.play.UnsignedCommand;
 
 import java.util.Arrays;
 

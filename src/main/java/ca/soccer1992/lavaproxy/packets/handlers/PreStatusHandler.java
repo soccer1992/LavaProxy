@@ -33,7 +33,9 @@ public class PreStatusHandler extends Handler{
             info.put("players", players.build());
             CompoundBinaryTag.Builder desc = CompoundBinaryTag.builder();
             if (c.protocol != MinecraftVersions.UNSUPPORTED) {
-                desc.putString("text", "A LavaProxy proxy.\nTotal connections: " + Main.CON_AMOUNT);
+                Component comp = ComponentUtils.parser.deserialize(c.fillPlaceholders(Main.motd, "", ""));
+                desc = desc.put((CompoundBinaryTag) ComponentUtils.nbt(comp, c.protocol));
+                //desc.putString("text", "A LavaProxy proxy.\nTotal connections: " + Main.CON_AMOUNT);
             } else {
                 Component comp = ComponentUtils.parser.deserialize(c.fillPlaceholders(Main.translations.get("error.unsupported"), "", ""));
                 desc = desc.put((CompoundBinaryTag) ComponentUtils.nbt(comp, c.protocol));

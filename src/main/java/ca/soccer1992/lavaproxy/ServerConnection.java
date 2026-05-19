@@ -7,14 +7,13 @@ import ca.soccer1992.lavaproxy.packets.readers.LoginReader;
 import ca.soccer1992.lavaproxy.packets.server.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class ServerConnection {
-    public Connection connect(Connection con, HandshakeIntent intent, String host, int port) {
+    public Connection connect(Connection con, HandshakeIntent intent, String host, int port, String serverName) {
 
-        EventLoopGroup group = new NioEventLoopGroup();
+        EventLoopGroup group = Main.nettyGroup;
         final Connection[] throughConnection = {null};
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -32,7 +31,8 @@ public class ServerConnection {
                             ch.attr(Main.BACKEND).set(con);
                             c.backendConnection = con;
                             con.backendConnection = c;
-                            String serverName = c.connectedServer;
+                            con.connectedServer = serverName;
+                            c.connectedServer = serverName;
                             ch.pipeline().addFirst(new NettyFrameDecoder());
 
                             ch.pipeline().addLast(new PacketProcessor(true));
@@ -47,7 +47,6 @@ public class ServerConnection {
                                         c.backendConnection.backendDisconnect("Connection closed");
                                     }
                                     c.close();
-                                    group.shutdownGracefully();
                                 }
 
                                 @Override
@@ -95,7 +94,11 @@ public class ServerConnection {
                         }
                     });
 
-            bootstrap.connect(host, port).sync();
+            bootstrap.connect(host, port).addListener((ChannelFutureListener) future -> {
+                if (!future.isSuccess()) {
+                    con.backendDisconnect(future.cause().toString());
+                }
+            });
 
         } catch (Exception e){
             con.backendDisconnect(e.toString());

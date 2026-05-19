@@ -2,7 +2,6 @@ package ca.soccer1992.lavaproxy;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
@@ -15,8 +14,8 @@ public class NettyServer {
     }
 
     public void start() throws Exception {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = Main.bossGroup;
+        EventLoopGroup workerGroup = Main.nettyGroup;
 
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
@@ -38,7 +37,7 @@ public class NettyServer {
 
             ChannelFuture future = bootstrap.bind(port).sync();
             System.out.printf("[Main] Server started on port %s%n", port);
-
+            System.out.println("Done, players can now connect!");
             future.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();

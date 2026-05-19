@@ -89,6 +89,7 @@ public class Connection {
                 .replace("{ipHost}",hostString)
                 .replace("{host}", host)
                 .replace("{port}",port+"")
+                .replace("{conAmount}",Main.CON_AMOUNT+"")
                 .replace("{backendBrand}",origBrand);
     }
 
@@ -152,7 +153,7 @@ public class Connection {
         String host = (String) serverInfo.get(0);
         Integer port = (Integer) serverInfo.get(1);
 
-        Connection con = new ServerConnection().connect(this, HandshakeIntent.LOGIN, host, port);
+        Connection con = new ServerConnection().connect(this, HandshakeIntent.LOGIN, host, port,server);
         if (con == null){
             connectedServer = null;
         }
