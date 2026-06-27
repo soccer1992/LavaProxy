@@ -3,6 +3,7 @@ package ca.soccer1992.lavaproxy.packets.client;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.*;
 
+import static ca.soccer1992.lavaproxy.utils.ComponentUtils.*;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 
 import com.google.gson.JsonElement;
@@ -23,10 +24,21 @@ public class NBTKick extends Packet {
     public void setReason(BinaryTag reason){this.reason = reason;}
 
     public void decode (ByteBuf buf, MinecraftVersions proto){
-        setReason(readTag(buf, proto));
+        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2)) {
+            setReason(readTag(buf, proto));
+        } else {
+            setReason(
+                    nbt(fromJSON(readString(buf)),proto)
+            );
+        };
+
     }
     public void encode(ByteBuf buf, MinecraftVersions proto){
-        writeTag(buf, proto, reason);
+        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2)) {
+            writeTag(buf, proto, reason);
+        } else {
+            writeString(deserialize(reason, true).toString(),buf);
+        }
     }
 
 }

@@ -46,6 +46,7 @@ public class Connection {
     public Map<Long, Long> keepAliveList = new HashMap<>();
     public CompoundBinaryTag _dimensionCodec = null;
     public CompoundBinaryTag _dimInfo = null;
+    public boolean _waitingForClientInfo = false;
     public boolean isRetrying = false;
     public Component _recentDisconnectMessage;
     public Iterator<String> tryIter = Arrays.stream(Main.trys).iterator();

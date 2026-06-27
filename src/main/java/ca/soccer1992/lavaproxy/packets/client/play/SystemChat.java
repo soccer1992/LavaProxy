@@ -10,6 +10,8 @@ import net.kyori.adventure.text.Component;
 
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.nbt;
+import static ca.soccer1992.lavaproxy.utils.NBTUtil.deserialize;
+import static ca.soccer1992.lavaproxy.utils.NBTUtil.serialize;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 
 public class SystemChat extends Packet {
@@ -29,6 +31,7 @@ public class SystemChat extends Packet {
     }
 
     public void encode (ByteBuf buf, MinecraftVersions proto){
+
         writeTag(buf, proto, nbt(message, proto));
         if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_19_1)){
             buf.writeBoolean(isActionBar);

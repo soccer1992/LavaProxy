@@ -16,16 +16,17 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         //Class<?> c = in.getClass();
         Connection con = ctx.channel().attr(Main.READER).get();
         try {
-            if (in instanceof InvalidPacket && con.conType != ConnectionTypes.PLAY){
-                con.close();
-
-                throw new InvalidObjectException("InvalidPacket cannot be processed inside of non-PLAY states.");
-            }
+            //if (in instanceof InvalidPacket && con.conType != ConnectionTypes.PLAY){
+            //    con.close();
+//
+            //    throw new InvalidObjectException("InvalidPacket cannot be processed inside of non-PLAY states.");
+            //}
             if (!con.packetHandler.handle(in, con)) {
                 //System.out.println("Packet was not handled...");
                 con.close();
             }
         } catch (Exception e){
+            e.printStackTrace();
              con.disconnect(e.getMessage(),true);
         }
 

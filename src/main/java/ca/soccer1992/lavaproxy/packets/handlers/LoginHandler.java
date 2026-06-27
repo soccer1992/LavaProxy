@@ -31,12 +31,12 @@ public class LoginHandler extends Handler{
             LoginSuccess success = new LoginSuccess();
             success.setName(c.plr.name);
             success.setUUID(c.plr.uuid);
-            if (c.protocol.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
-                //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing (<1.20.2 LOGIN KICK)</rainbow>"),false);
-                //c.connect(c.tryIter.next());
-                c.disconnect("<1.20.2 is currently not supported, sorry!", false);
-                return true;
-            }
+            //if (c.protocol.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
+            //    //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing (<1.20.2 LOGIN KICK)</rainbow>"),false);
+            //    //c.connect(c.tryIter.next());
+            //    c.disconnect("<1.20.2 is currently not supported, sorry!", false);
+            //    return true;
+            //}
             c.writePacket(success);
             if (c.protocol.getProtocol()< MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
                 // instantly change it xd

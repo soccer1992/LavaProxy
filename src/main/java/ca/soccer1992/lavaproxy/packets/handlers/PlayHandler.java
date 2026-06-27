@@ -2,6 +2,7 @@ package ca.soccer1992.lavaproxy.packets.handlers;
 
 import ca.soccer1992.lavaproxy.Connection;
 import ca.soccer1992.lavaproxy.Main;
+import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
@@ -63,6 +64,7 @@ public class PlayHandler extends Handler{
         if (p instanceof ClientInfo packet) {
             c.plr.setInfo(packet);
             c.backendConnection.writePacketServer(packet);
+
             return true;
         }
         if (p instanceof PluginMessage packet) {

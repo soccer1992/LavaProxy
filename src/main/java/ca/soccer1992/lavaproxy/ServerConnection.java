@@ -52,13 +52,13 @@ public class ServerConnection {
                                 @Override
                                 public void channelActive(ChannelHandlerContext ctx) {
                                     //
+                                    c.setProtocol(con.protocol);
                                     HandshakePacket p = new HandshakePacket();
                                     p.setIntent(intent);
                                     p.setProtocol(con.protocol);
                                     p.setHost(con.connectAddr.getHostString());
                                     p.setPort(con.connectAddr.getPort());
                                     c.writePacketServer(p);
-                                    c.setProtocol(con.protocol);
                                     c.isBackend = true;
                                     if (intent.getId()>1) {
                                         LoginStart login = new LoginStart();
@@ -78,7 +78,7 @@ public class ServerConnection {
                                                 && con.conType != ConnectionTypes.PRE_STATUS
                                                 && con.conType != ConnectionTypes.STATUS){
                                             // send a keepalive
-                                            con.sendKeepAlive();
+                                            //con.sendKeepAlive();
                                         }
 
                                     }

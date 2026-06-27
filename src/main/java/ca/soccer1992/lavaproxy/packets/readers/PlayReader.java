@@ -126,16 +126,18 @@ public class PlayReader extends Reader {
             ),
             ClientInfo.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x15),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x4),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12, 0x5),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12_1, 0x7),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_14, 0x8),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x7),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x8),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x9),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0xA),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0xC),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0xD)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x04),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12, 0x05),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12_1, 0x04),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_14, 0x05),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x07),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x08),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x07),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x08),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x09),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0A),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x0C),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x0D)
 
             ),
             PluginMessage.class, List.of(

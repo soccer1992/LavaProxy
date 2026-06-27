@@ -11,7 +11,10 @@ public record Identifier(String id, String name) {
         writeString(id + ":" + name, buf);
     }
     public static Identifier read(ByteBuf buf, MinecraftVersions proto){
-        String[] z = readString(buf).split(":");
+        return read(readString(buf));
+    }
+    public static Identifier read(String identifier){
+        String[] z = identifier.split(":");
         if (z.length > 2){
             throw new IllegalArgumentException("Identifier is invalid!");
         }
@@ -19,5 +22,8 @@ public record Identifier(String id, String name) {
             return new Identifier("minecraft", z[0]);
         }
         return new Identifier(z[0], z[1]);
+    }
+    public String toString(){
+        return id + ":" + name;
     }
 }

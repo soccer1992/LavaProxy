@@ -14,6 +14,7 @@ import ca.soccer1992.lavaproxy.packets.clientserver.KnownPacks;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.handlers.Handler;
 import ca.soccer1992.lavaproxy.packets.server.FeatureFlags;
+import ca.soccer1992.lavaproxy.types.Identifier;
 import ca.soccer1992.lavaproxy.types.RegistryPart;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -48,21 +49,23 @@ public class ConfigHandler extends Handler {
             return true;
         }
         if (p instanceof final RegistryData packet){
-            if (Objects.equals(packet.id.name(), "dimension_type")){
-                CompoundBinaryTag.Builder codec = CompoundBinaryTag.builder();
-                Map<String, Integer> dimMap = new HashMap<>();
-                for (RegistryPart part : packet.RegistryData.values()){
-                    if (!part.hasNBT()){
-                        continue;
-                        //throw new IllegalArgumentException("dimension_type does not have NBT attached to RegistryPart");
-                    }
-                    BinaryTag t = part.nbt();
-                    codec.put(part.entry(),t); // confirmed to have nbt
-                    dimMap.put(part.entry(), part.id());
+            for (Map.Entry<Identifier, Map<Integer, RegistryPart>> mapping : packet.RegistryData.entrySet()) {
+                if (Objects.equals(mapping.getKey().name(), "dimension_type")) {
+                    CompoundBinaryTag.Builder codec = CompoundBinaryTag.builder();
+                    Map<String, Integer> dimMap = new HashMap<>();
+                    for (RegistryPart part : mapping.getValue().values()) {
+                        if (!part.hasNBT()) {
+                            continue;
+                            //throw new IllegalArgumentException("dimension_type does not have NBT attached to RegistryPart");
+                        }
+                        BinaryTag t = part.nbt();
+                        codec.put(part.entry(), t); // confirmed to have nbt
+                        dimMap.put(part.entry(), part.id());
 
+                    }
+                    c._dimensionMap = dimMap;
+                    c._dimensionCodec = codec.build();
                 }
-                c._dimensionMap = dimMap;
-                c._dimensionCodec = codec.build();
             }
             backendConnection.writePacket(packet);
             return true;

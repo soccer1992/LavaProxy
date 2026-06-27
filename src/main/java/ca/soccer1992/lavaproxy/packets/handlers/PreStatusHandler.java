@@ -10,7 +10,9 @@ import ca.soccer1992.lavaproxy.packets.readers.StatusReader;
 import ca.soccer1992.lavaproxy.packets.server.status.*;
 import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 import ca.soccer1992.lavaproxy.utils.NBTUtil;
+import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
 
 public class PreStatusHandler extends Handler{
@@ -34,7 +36,13 @@ public class PreStatusHandler extends Handler{
             CompoundBinaryTag.Builder desc = CompoundBinaryTag.builder();
             if (c.protocol != MinecraftVersions.UNSUPPORTED) {
                 Component comp = ComponentUtils.parser.deserialize(c.fillPlaceholders(Main.motd, "", ""));
-                desc = desc.put((CompoundBinaryTag) ComponentUtils.nbt(comp, c.protocol));
+                BinaryTag tag = ComponentUtils.nbt(comp, c.protocol);
+                if (tag instanceof StringBinaryTag t){
+                    desc = desc.put("text",t);
+                } else if (tag instanceof CompoundBinaryTag t){
+                    desc = desc.put(t);
+                }
+                //desc = desc.put((CompoundBinaryTag) );
                 //desc.putString("text", "A LavaProxy proxy.\nTotal connections: " + Main.CON_AMOUNT);
             } else {
                 Component comp = ComponentUtils.parser.deserialize(c.fillPlaceholders(Main.translations.get("error.unsupported"), "", ""));

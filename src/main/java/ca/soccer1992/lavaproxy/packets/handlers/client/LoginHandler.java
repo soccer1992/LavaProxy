@@ -44,11 +44,11 @@ public class LoginHandler extends Handler {
 
         }
         if (p instanceof LoginSuccess){
-            c.writePacketServer(new LoginAck());
 
             if (c.protocol.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
                 c.conType = ConnectionTypes.PLAY;
                 c.setReader(new PlayReader());
+                c.setHandler(new PlayHandler());
                 //return true;
                 c.backendConnection.tryIter = Arrays.stream(Main.trys).iterator();
                 if (Main.trys[0].equals(c.backendConnection.connectedServer)) c.backendConnection.tryIter.next();
@@ -56,10 +56,11 @@ public class LoginHandler extends Handler {
             }
 
             if (c.protocol.getProtocol()>= MinecraftVersions.MINECRAFT_1_20_2.getProtocol()) {
+                c.writePacketServer(new LoginAck());
                 c.conType = ConnectionTypes.CONFIG;
                 c.setReader(new ConfigReader());
                 c.setHandler(new ConfigHandler());
-                if (c.backendConnection.plr.brand==null) {
+                if (c.backendConnection.plr.brand!=null) {
                     PluginMessage brandMessage = new PluginMessage();
                     brandMessage.setChannel("minecraft:brand");
                     ByteBuf tmpOut = Unpooled.buffer();

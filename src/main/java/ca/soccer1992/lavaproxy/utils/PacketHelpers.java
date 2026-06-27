@@ -21,7 +21,7 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 public class PacketHelpers {
     private static final GsonComponentSerializer PRE_1_16_SERIALIZER =
-            GsonComponentSerializer.colorDownsamplingGson().toBuilder()
+            GsonComponentSerializer.builder()
                     .legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get())
                     .options(
                             OptionSchema.globalSchema().stateBuilder()

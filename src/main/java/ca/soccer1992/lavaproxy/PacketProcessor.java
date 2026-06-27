@@ -66,6 +66,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
             ctx.fireChannelRead(p);
 
         } catch (Exception e){
+            e.printStackTrace();
             con.disconnect(Component.text(e.toString()), true);
         } finally{
             if (release.refCnt() > 0) release.release();
