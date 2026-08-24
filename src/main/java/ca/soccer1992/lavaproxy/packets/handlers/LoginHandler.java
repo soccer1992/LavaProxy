@@ -1,7 +1,6 @@
 package ca.soccer1992.lavaproxy.packets.handlers;
 
 import ca.soccer1992.lavaproxy.Connection;
-import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
@@ -25,7 +24,7 @@ public class LoginHandler extends Handler{
             c.plr.setUUID(packet.uuid);
             //c.sendCompression(256);
 
-            System.out.println(c.fillPlaceholders(Main.translations.get("log.connect"), "", ""));
+            System.out.println(c.fillPlaceholders("log.connect", "", ""));
 
             //System.out.printf("Player %s (%s) has started login%n",c.plr, c.addr.getHostString());
             LoginSuccess success = new LoginSuccess();

@@ -41,6 +41,8 @@ public class Main {
         translations.put("log.brand","{player} brand: {brand}");
         translations.put("backend.disconnect","{player} has disconnected from {serverName}: {message}");
         translations.put("backend.brand","{backendBrand} [LavaProxy]");
+        translations.put("connect.alreadyConnected","<red>You are already connected to this server</red>");
+
         File config = new File("config.toml");
         if (!config.exists()) {
             Files.writeString(config.toPath(), """
@@ -76,12 +78,12 @@ public class Main {
                 System.out.printf("Error loading server %s: Invalid Port%n", i);
                 continue;
             }
-            servers.put(i, new ArrayList<>(List.of(ipport[0],Integer.parseInt(port))));
+            servers.put(i.toLowerCase(), new ArrayList<>(List.of(ipport[0],Integer.parseInt(port))));
         }
         ArrayList<String> newTrys = new ArrayList<>();
         for (String i : trys){
-            if (servers.containsKey(i)) {
-                newTrys.add(i);
+            if (servers.containsKey(i.toLowerCase())) {
+                newTrys.add(i.toLowerCase());
             } else {
                 System.out.printf("[WARN] Server %s does not exist, try will not be used.%n",i);
             }

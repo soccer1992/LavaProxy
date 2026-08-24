@@ -45,7 +45,7 @@ public class PreStatusHandler extends Handler{
                 //desc = desc.put((CompoundBinaryTag) );
                 //desc.putString("text", "A LavaProxy proxy.\nTotal connections: " + Main.CON_AMOUNT);
             } else {
-                Component comp = ComponentUtils.parser.deserialize(c.fillPlaceholders(Main.translations.get("error.unsupported"), "", ""));
+                Component comp = ComponentUtils.parser.deserialize(c.fillPlaceholders("error.unsupported", "", ""));
                 desc = desc.put((CompoundBinaryTag) ComponentUtils.nbt(comp, c.protocol));
             }
             info.put("description", desc.build());
@@ -54,7 +54,7 @@ public class PreStatusHandler extends Handler{
             } catch (Exception e) {
                 c.close();
             }
-            if (Main.logPings) System.out.println(c.fillPlaceholders(Main.translations.get("log.ping"), "", ""));
+            if (Main.logPings) System.out.println(c.fillPlaceholders("log.ping", "", ""));
             c.conType = ConnectionTypes.STATUS;
             c.setReader(new StatusReader());
             c.setHandler(new StatusHandler());

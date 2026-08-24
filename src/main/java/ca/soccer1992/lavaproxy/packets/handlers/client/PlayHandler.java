@@ -1,7 +1,6 @@
 package ca.soccer1992.lavaproxy.packets.handlers.client;
 
 import ca.soccer1992.lavaproxy.Connection;
-import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.UnsignedChat;
@@ -17,7 +16,7 @@ public class PlayHandler extends Handler {
         if (p instanceof Login packet){
             c._dimensionName = packet.dimension;
             c.backendConnection.writePacket(packet);
-            System.out.println(c.backendConnection.fillPlaceholders(Main.translations.get("log.connected"), "", c.backendConnection.plr.brand));
+            System.out.println(c.backendConnection.fillPlaceholders("log.connected", "", c.backendConnection.plr.brand));
             //c.backendConnection.plr.sendMessage(Component.text("if you see this, it worked."),false);
 
             //c._dimInfo = c._dimensionCodec.getCompoundTag(packet.dimension);

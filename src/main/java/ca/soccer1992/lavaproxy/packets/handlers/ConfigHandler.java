@@ -62,7 +62,7 @@ public class ConfigHandler extends Handler{
             ByteBuf dataBuf = Unpooled.copiedBuffer(packet.data);
             if (packet.channel.equals("minecraft:brand")){
                 c.plr.setBrand(readString(dataBuf));
-                System.out.println(c.fillPlaceholders(Main.translations.get("log.brand"), "", c.plr.brand));
+                System.out.println(c.fillPlaceholders("log.brand", "", c.plr.brand));
                 //System.out.printf("%s brand: %s%n",c.plr, c.plr.brand);
             }
             dataBuf.release();

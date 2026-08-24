@@ -1,7 +1,6 @@
 package ca.soccer1992.lavaproxy.packets.handlers;
 
 import ca.soccer1992.lavaproxy.Connection;
-import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.HandshakeIntent;
@@ -36,7 +35,7 @@ public class HandshakeHandler extends Handler{
                 c.conType = ConnectionTypes.LOGIN;
                 c.setHandler(new LoginHandler());
                 if (packet.proto == MinecraftVersions.UNSUPPORTED){
-                    c.disconnect(ComponentUtils.parser.deserialize(c.fillPlaceholders(Main.translations.get("error.unsupported"),"","")), true);
+                    c.disconnect(ComponentUtils.parser.deserialize(c.fillPlaceholders("error.unsupported","","")), true);
                     return true;
                 }
                 return true;

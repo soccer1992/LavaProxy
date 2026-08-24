@@ -1,7 +1,6 @@
 package ca.soccer1992.lavaproxy.packets.handlers.client;
 
 import ca.soccer1992.lavaproxy.Connection;
-import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.NBTKick;
@@ -105,7 +104,7 @@ public class ConfigHandler extends Handler {
                 // rewrite
                 PluginMessage rewrite = new PluginMessage();
                 String rewritten = readString(dataBuf);
-                rewritten = backendConnection.fillPlaceholders(Main.translations.get("backend.brand"),"",backendConnection.plr.brand, "", 0, rewritten);
+                rewritten = backendConnection.fillPlaceholders("backend.brand","",backendConnection.plr.brand, "", 0, rewritten);
                 ByteBuf buf = Unpooled.buffer();
                 writeString(rewritten, buf);
                 byte[] out = new byte[buf.readableBytes()];

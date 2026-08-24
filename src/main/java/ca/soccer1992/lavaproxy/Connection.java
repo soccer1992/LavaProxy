@@ -50,6 +50,7 @@ public class Connection {
     public boolean isRetrying = false;
     public Component _recentDisconnectMessage;
     public Iterator<String> tryIter = Arrays.stream(Main.trys).iterator();
+    public Map<String, String> selfTranslations = Main.translations;
     public void setCompression(int amt){
         this.compressionAmount = amt;
     }
@@ -71,6 +72,7 @@ public class Connection {
         return fillPlaceholders(placeholder, kickMsg, brand, "", 0,"");
     }
     public String fillPlaceholders(String placeholder, String kickMsg, String brand, String host, int port, String origBrand){
+        placeholder = selfTranslations.getOrDefault(placeholder,placeholder);
         String conServer = "";
         if (connectedServer != null){
             conServer = connectedServer;
@@ -110,9 +112,9 @@ public class Connection {
         if (isRetrying) return;
         isRetrying = true;
         backendConnection = null;
-        _recentDisconnectMessage = parser.deserialize(fillPlaceholders(Main.translations.get("backend.player.disconnect"), miniMessage(message), plr.brand)); //Component.text("You have been disconnected from " + connectedServer + ": ").color(NamedTextColor.RED).append(message);
+        _recentDisconnectMessage = parser.deserialize(fillPlaceholders("backend.player.disconnect", miniMessage(message), plr.brand)); //Component.text("You have been disconnected from " + connectedServer + ": ").color(NamedTextColor.RED).append(message);
 
-        System.out.println(fillPlaceholders(Main.translations.get("backend.disconnect"), plain(message), plr.brand));
+        System.out.println(fillPlaceholders("backend.disconnect", plain(message), plr.brand));
         connectedServer = null;
         if (lastServer != null){
             connect(lastServer);
@@ -310,7 +312,7 @@ public class Connection {
         if (backendConnection != null && !backendConnection.hasDisconnected && !backendConnection.isClosed && !isBackend) backendConnection.close();
 
         if (nolog) return;
-        System.out.println(fillPlaceholders(Main.translations.get("log.disconnect"), plain(reason), plr.brand));
+        System.out.println(fillPlaceholders("log.disconnect", plain(reason), plr.brand));
         //System.out.printf("%s has disconnected for: %s%n",plr,PlainTextComponentSerializer.plainText().serialize(reason));
     }
     public void close(){

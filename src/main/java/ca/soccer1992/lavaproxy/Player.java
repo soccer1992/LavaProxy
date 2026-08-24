@@ -15,6 +15,8 @@ import net.kyori.adventure.text.Component;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static ca.soccer1992.lavaproxy.utils.ComponentUtils.parser;
+
 public class Player {
     public Connection con;
     public String name = null;
@@ -29,7 +31,12 @@ public class Player {
         this.knownPacks = knownPack;
 
     }
-
+    public void transferToServer(String server){
+        if (server.equals(con.connectedServer)){
+            sendMessage(parser.deserialize(con.fillPlaceholders("connect.alreadyConnected", "", brand)), false);
+            return;
+        }
+    }
     public void sendMessage(Component msg, boolean isActionBar){
         Packet p;
         if (con.protocol.isGreaterEquals(MinecraftVersions.MINECRAFT_1_19)) {
