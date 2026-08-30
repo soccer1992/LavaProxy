@@ -80,6 +80,12 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x04),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x05),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x06)
+            ),
+            EnterConfiguration.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x0B),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0C),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x0E),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x0F)
             )
     );
     public Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of(
@@ -124,6 +130,15 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x72),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x77)
             ),
+            EnterConfiguration.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x65),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_3, 0x67),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x69),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x70),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x6F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x74)
+
+                    ),
             ClientInfo.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x15),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x04),

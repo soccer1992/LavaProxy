@@ -4,6 +4,7 @@ import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.UnsignedChat;
 import ca.soccer1992.lavaproxy.packets.client.play.SystemChat;
+import ca.soccer1992.lavaproxy.packets.clientserver.EnterConfiguration;
 import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
 import ca.soccer1992.lavaproxy.types.KnownPack;
 import ca.soccer1992.lavaproxy.utils.ComponentUtils;
@@ -36,6 +37,12 @@ public class Player {
             sendMessage(parser.deserialize(con.fillPlaceholders("connect.alreadyConnected", "", brand)), false);
             return;
         }
+        if (!Main.servers.containsKey(server.toLowerCase())){
+            sendMessage(parser.deserialize(con.fillPlaceholders("connect.notExist", "", brand)), false);
+            return;
+        }
+        con.waitingServer = server;
+        con.writePacket(new EnterConfiguration());
     }
     public void sendMessage(Component msg, boolean isActionBar){
         Packet p;

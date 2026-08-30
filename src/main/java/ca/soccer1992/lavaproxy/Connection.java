@@ -8,6 +8,7 @@ import ca.soccer1992.lavaproxy.packets.client.Transfer;
 import ca.soccer1992.lavaproxy.packets.client.login.CompressionPacket;
 import ca.soccer1992.lavaproxy.packets.client.login.LoginKick;
 import ca.soccer1992.lavaproxy.packets.client.NBTKick;
+import ca.soccer1992.lavaproxy.packets.clientserver.EnterConfiguration;
 import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.handlers.*;
 import ca.soccer1992.lavaproxy.packets.readers.*;
@@ -36,6 +37,7 @@ public class Connection {
     public Player plr;
     public ConnectionTypes conType = ConnectionTypes.HANDSHAKE;
     public String connectedServer = null;
+    public String waitingServer = null;
     public String lastServer = null;
     public Connection backendConnection = null;
     public boolean isClosed = false;
@@ -71,12 +73,16 @@ public class Connection {
     public String fillPlaceholders(String placeholder, String kickMsg, String brand){
         return fillPlaceholders(placeholder, kickMsg, brand, "", 0,"");
     }
-    public String fillPlaceholders(String placeholder, String kickMsg, String brand, String host, int port, String origBrand){
-        placeholder = selfTranslations.getOrDefault(placeholder,placeholder);
+    public String fillPlaceholders(String placeholder, String kickMsg, String brand, String host, int port, String origBrand) {
         String conServer = "";
         if (connectedServer != null){
             conServer = connectedServer;
         }
+        return fillPlaceholders(placeholder, kickMsg, brand, host, port, origBrand, conServer);
+    }
+    public String fillPlaceholders(String placeholder, String kickMsg, String brand, String host, int port, String origBrand, String customServerName){
+        placeholder = selfTranslations.getOrDefault(placeholder,placeholder);
+
         String addrThing = "";
         String hostString =  "";
         if (addr != null){
@@ -88,7 +94,7 @@ public class Connection {
                 .replace("{player}",plr.toString())
                 .replace("{message}",kickMsg)
                 .replace("{brand}",brand)
-                .replace("{serverName}",conServer)
+                .replace("{serverName}",customServerName)
                 .replace("{ipHost}",hostString)
                 .replace("{host}", host)
                 .replace("{port}",port+"")
@@ -151,6 +157,13 @@ public class Connection {
     }
     public void connect(String server){
         if (isClosed) return;
+        // if we are in PLAY state, send a reconfiguration if the protocol is 1.20.2+
+        if (conType == ConnectionTypes.PLAY && protocol.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2)){
+            waitingServer = server;
+            writePacket(new EnterConfiguration());
+            return; // this will continue the connection after (inside of PlayHandler)
+        }
+        lastServer = connectedServer;
         connectedServer = server;
         ArrayList<Object> serverInfo = Main.servers.get(server);
         String host = (String) serverInfo.get(0);

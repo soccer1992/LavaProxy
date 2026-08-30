@@ -1,12 +1,12 @@
 package ca.soccer1992.lavaproxy;
-import ca.soccer1992.lavaproxy.utils.ComponentUtils;
+import ca.soccer1992.lavaproxy.commands.ServerCommand;
 import com.moandjiezana.toml.Toml;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
 
+import javax.naming.Name;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
@@ -42,6 +42,9 @@ public class Main {
         translations.put("backend.disconnect","{player} has disconnected from {serverName}: {message}");
         translations.put("backend.brand","{backendBrand} [LavaProxy]");
         translations.put("connect.alreadyConnected","<red>You are already connected to this server</red>");
+        translations.put("connect.notExist","<red>This server does not exist</red>");
+        translations.put("command.server.hover_msg","Connect to {serverName}");
+        translations.put("command.server.default_msg","<aqua>You are currently connected to {serverName}</aqua><newline>");
 
         File config = new File("config.toml");
         if (!config.exists()) {
@@ -93,11 +96,7 @@ public class Main {
         if (trys.length == 0) System.out.println("[WARN] No tries loaded, connections will fail!");
         if (servers.isEmpty()) System.out.println("[WARN] No servers loaded, connections will fail!");
         dispatcher.register(
-                LiteralArgumentBuilder.<Player>literal("getkicked")
-                        .executes(ctx -> {
-                            ctx.getSource().con.disconnect(ComponentUtils.parser.deserialize("<green>yea, you got kicked...<newline>i dont really know what you were expecting"), true);
-                            return 1;
-                        })
+                ServerCommand.create()
         );
         //System.out.println(root.value.values());
         //root = new CompoundTag("root");

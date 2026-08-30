@@ -2,12 +2,13 @@ package ca.soccer1992.lavaproxy.packets.handlers;
 
 import ca.soccer1992.lavaproxy.Connection;
 import ca.soccer1992.lavaproxy.Main;
-import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
+import ca.soccer1992.lavaproxy.packets.clientserver.EnterConfiguration;
 import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
+import ca.soccer1992.lavaproxy.packets.readers.ConfigReader;
 import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
 import ca.soccer1992.lavaproxy.packets.server.*;
 import ca.soccer1992.lavaproxy.packets.server.play.ChatCommand;
@@ -38,6 +39,19 @@ public class PlayHandler extends Handler{
         //System.out.printf("[IN] " + p.getClass().getSimpleName() + " ");
 
         if (c.backendConnection == null) return true;
+        if (p instanceof EnterConfiguration){
+            c.setReader(new ConfigReader());
+            c.conType = ConnectionTypes.CONFIG;
+            c.setHandler(new ConfigHandler());
+            if (c.waitingServer!=null){
+                c.backendConnection.close();
+                c.connect(c.waitingServer);
+                c.waitingServer = null;
+            } else {
+                c.backendConnection.writePacketServer(p);
+            }
+            return true;
+        }
         if (p instanceof UnsignedChat packet){
             if (packet.msg.startsWith("/")){
                 if (!c.plr.executeCommand(packet.msg.substring(1))) c.backendConnection.writePacketServer(packet);
