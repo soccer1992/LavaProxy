@@ -94,6 +94,7 @@ public class Main {
         trys = newTrys.toArray(String[]::new);
         if (trys.length == 0) System.out.println("[WARN] No tries loaded, connections will fail!");
         if (servers.isEmpty()) System.out.println("[WARN] No servers loaded, connections will fail!");
+        System.out.println("Loaded " + servers.size() + " server(s).");
         dispatcher.register(
                 ServerCommand.create()
         );
