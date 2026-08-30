@@ -50,9 +50,9 @@ public class Main {
         File config = new File("config.toml");
 
         if (!config.exists()) {
-            try (InputStream in = Main.class.getResourceAsStream("/config.yml")) {
+            try (InputStream in = Main.class.getResourceAsStream("/config.toml")) {
                 if (in == null) {
-                    throw new IOException("Missing config.yml resource");
+                    throw new IOException("Missing config.toml resource");
                 }
 
                 Files.copy(in, config.toPath());
