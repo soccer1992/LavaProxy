@@ -72,7 +72,7 @@ public class Main {
         logPings = logging.getBoolean("pings");
         trys = toml.getList("tries").toArray(new String[0]);
         int hostPort = settings.getLong("port",25577L).intValue();
-        forwardType = serverSettings.getString("forward-type", "").toLowerCase();
+        forwardType = serverSettings.getString("forward-mode", "").toLowerCase();
         forwardKey = serverSettings.getString("forward-key", "");
 
         switch (forwardType){
