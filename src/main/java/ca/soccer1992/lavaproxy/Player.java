@@ -33,7 +33,7 @@ public class Player {
 
     }
     public void transferToServer(String server){
-        if (server.equals(con.connectedServer)){
+        if (server.equals(con.connectedServer.name)){
             sendMessage(parser.deserialize(con.fillPlaceholders("connect.alreadyConnected", "", brand)), false);
             return;
         }
@@ -41,7 +41,8 @@ public class Player {
             sendMessage(parser.deserialize(con.fillPlaceholders("connect.notExist", "", brand)), false);
             return;
         }
-        con.waitingServer = server;
+
+        con.waitingServer = Main.servers.get(server);
         con.writePacket(new EnterConfiguration());
     }
     public void sendMessage(Component msg, boolean isActionBar){

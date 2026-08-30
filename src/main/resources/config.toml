@@ -8,3 +8,6 @@ pings = true
 [settings]
 motd = "A LavaProxy proxy.<newline>Total connections: {conAmount}"
 port = 25577
+[server-settings]
+forward-mode = "none" # none, bungeecord (ip forward), bungeeguard (forward-key)
+forward-key = "" # use for bungeeguard

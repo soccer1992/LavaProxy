@@ -1,5 +1,6 @@
 package ca.soccer1992.lavaproxy;
 import ca.soccer1992.lavaproxy.commands.ServerCommand;
+import ca.soccer1992.lavaproxy.types.ServerDefinition;
 import com.moandjiezana.toml.Toml;
 import com.mojang.brigadier.CommandDispatcher;
 import io.netty.channel.EventLoopGroup;
@@ -26,11 +27,14 @@ public class Main {
     public static final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
     public static String motd;
 
-    public static final HashMap<String, ArrayList<Object>> servers = new HashMap<>();
+    public static final HashMap<String, ServerDefinition> servers = new HashMap<>();
     public static boolean logErrors;
     public static boolean logPings;
     public static int CON_AMOUNT = 0;
     public static final Map<UUID, Player> players = new ConcurrentHashMap<>();
+    public static String forwardType = "none";
+    public static String forwardKey = "";
+
     public static void main(String[] args) throws Exception {
         translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
         translations.put("log.ping","{ip} has pinged");
@@ -58,14 +62,34 @@ public class Main {
                 Files.copy(in, config.toPath());
             }
         }
+
         Toml toml = new Toml().read(config);
         Toml logging = toml.getTable("logging");
+        Toml serverSettings = toml.getTable("server-settings");
         Toml settings = toml.getTable("settings");
         motd = settings.getString("motd");
         logErrors = logging.getBoolean("errors");
         logPings = logging.getBoolean("pings");
         trys = toml.getList("tries").toArray(new String[0]);
         int hostPort = settings.getLong("port",25577L).intValue();
+        forwardType = serverSettings.getString("forward-type", "").toLowerCase();
+        forwardKey = serverSettings.getString("forward-key", "");
+
+        switch (forwardType){
+            case "none":
+            case "bungeecord":
+                // ignore
+                break;
+            case "bungeeguard":
+                if (forwardKey.isEmpty()){
+                    System.out.println("Forward key is not defined in key-requiring mode! Defaulting to none.");
+                } else {
+                    break;
+                }
+            default:
+                forwardType = "none";
+                break;
+        }
         Map<String, Object> servs = toml.getTable("servers").toMap();
         for (String i : servs.keySet()){
             String ip = toml.getTable("servers").getString(i);
@@ -80,7 +104,11 @@ public class Main {
                 System.out.printf("Error loading server %s: Invalid Port%n", i);
                 continue;
             }
-            servers.put(i.toLowerCase(), new ArrayList<>(List.of(ipport[0],Integer.parseInt(port))));
+            ServerDefinition definition =  new ServerDefinition(i.toLowerCase(), ipport[0],Integer.parseInt(port));
+            definition.forwardType = forwardType;
+            definition.forwardKey = forwardKey;
+
+            servers.put(i.toLowerCase(), definition);
         }
         ArrayList<String> newTrys = new ArrayList<>();
         for (String i : trys){
@@ -98,6 +126,7 @@ public class Main {
         dispatcher.register(
                 ServerCommand.create()
         );
+
         //System.out.println(root.value.values());
         //root = new CompoundTag("root");
         //root.put(new StringTag("name","hello"));

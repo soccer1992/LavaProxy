@@ -5,13 +5,15 @@ import ca.soccer1992.lavaproxy.packets.HandshakeIntent;
 import ca.soccer1992.lavaproxy.packets.handlers.client.LoginHandler;
 import ca.soccer1992.lavaproxy.packets.readers.LoginReader;
 import ca.soccer1992.lavaproxy.packets.server.*;
+import ca.soccer1992.lavaproxy.types.ServerDefinition;
+import ca.soccer1992.lavaproxy.utils.ForwardUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class ServerConnection {
-    public Connection connect(Connection con, HandshakeIntent intent, String host, int port, String serverName) {
+    public Connection connect(Connection con, HandshakeIntent intent, ServerDefinition server) {
 
         EventLoopGroup group = Main.nettyGroup;
         final Connection[] throughConnection = {null};
@@ -20,6 +22,7 @@ public class ServerConnection {
 
             bootstrap.group(group)
                     .channel(NioSocketChannel.class)
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
@@ -30,8 +33,8 @@ public class ServerConnection {
                             ch.attr(Main.BACKEND).set(con);
                             c.backendConnection = con;
                             con.backendConnection = c;
-                            con.connectedServer = serverName;
-                            c.connectedServer = serverName;
+                            con.connectedServer = server;
+                            c.connectedServer = server;
                             ch.pipeline().addFirst(new NettyFrameDecoder());
 
                             ch.pipeline().addLast(new PacketProcessor(true));
@@ -42,7 +45,7 @@ public class ServerConnection {
                                 public void channelInactive(ChannelHandlerContext ctx){
                                     //if (c.heldData.refCnt() > 0) c.heldData.release();
 
-                                    if (con.backendConnection == c && c.connectedServer != null && c.connectedServer.equals(serverName)) { // only disconnect if still the active backend
+                                    if (con.backendConnection == c && c.connectedServer != null && c.connectedServer.equals(server)) { // only disconnect if still the active backend
                                         c.backendConnection.backendDisconnect("Connection closed");
                                     }
                                     c.close();
@@ -55,7 +58,17 @@ public class ServerConnection {
                                     HandshakePacket p = new HandshakePacket();
                                     p.setIntent(intent);
                                     p.setProtocol(con.protocol);
-                                    p.setHost(con.connectAddr.getHostString());
+                                    switch (server.forwardType){
+                                        case "none":
+                                            p.setHost(con.connectAddr.getHostString());
+                                            break;
+                                        case "bungeecord":
+                                            p.setHost(ForwardUtils.buildBungeeCordData(con.plr, null));
+                                            break;
+                                        case "bungeeguard":
+                                            p.setHost(ForwardUtils.buildBungeeGuardData(con.plr, server.forwardKey, null));
+                                            break;
+                                    }
                                     p.setPort(con.connectAddr.getPort());
                                     c.writePacketServer(p);
                                     c.isBackend = true;
@@ -77,7 +90,7 @@ public class ServerConnection {
                                                 && con.conType != ConnectionTypes.PRE_STATUS
                                                 && con.conType != ConnectionTypes.STATUS){
                                             // send a keepalive
-                                            //con.sendKeepAlive();
+                                            con.sendKeepAlive();
                                         }
 
                                     }
@@ -93,7 +106,7 @@ public class ServerConnection {
                         }
                     });
 
-            bootstrap.connect(host, port).addListener((ChannelFutureListener) future -> {
+            bootstrap.connect(server.host, server.port).addListener((ChannelFutureListener) future -> {
                 if (!future.isSuccess()) {
                     con.backendDisconnect(future.cause().toString());
                 }

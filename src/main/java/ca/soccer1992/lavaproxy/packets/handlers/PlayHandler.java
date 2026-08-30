@@ -28,7 +28,7 @@ public class PlayHandler extends Handler{
         if (modifyBackendConnection) c.backendConnection.setReader(new PlayReader());
         if (modifyBackendConnection) c.backendConnection.setHandler(new ca.soccer1992.lavaproxy.packets.handlers.client.PlayHandler());
         c.tryIter = Arrays.stream(Main.trys).iterator();
-        if (Main.trys[0].equals(c.connectedServer)) c.tryIter.next();
+        if (Main.trys[0].equals(c.connectedServer.name)) c.tryIter.next();
         if (c._recentDisconnectMessage != null){
             c.plr.sendMessage(c._recentDisconnectMessage, false);
         }
@@ -45,7 +45,7 @@ public class PlayHandler extends Handler{
             c.setHandler(new ConfigHandler());
             if (c.waitingServer!=null){
                 c.backendConnection.close();
-                c.connect(c.waitingServer);
+                c.connect(c.waitingServer.name);
                 c.waitingServer = null;
             } else {
                 c.backendConnection.writePacketServer(p);

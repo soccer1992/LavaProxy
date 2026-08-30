@@ -13,6 +13,7 @@ import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.handlers.*;
 import ca.soccer1992.lavaproxy.packets.readers.*;
 import ca.soccer1992.lavaproxy.packets.readers.Reader;
+import ca.soccer1992.lavaproxy.types.ServerDefinition;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -36,9 +37,9 @@ public class Connection {
     public Handler packetHandler;
     public Player plr;
     public ConnectionTypes conType = ConnectionTypes.HANDSHAKE;
-    public String connectedServer = null;
-    public String waitingServer = null;
-    public String lastServer = null;
+    public ServerDefinition connectedServer = null;
+    public ServerDefinition waitingServer = null;
+    public ServerDefinition lastServer = null;
     public Connection backendConnection = null;
     public boolean isClosed = false;
     public boolean isBackend = false;
@@ -76,7 +77,7 @@ public class Connection {
     public String fillPlaceholders(String placeholder, String kickMsg, String brand, String host, int port, String origBrand) {
         String conServer = "";
         if (connectedServer != null){
-            conServer = connectedServer;
+            conServer = connectedServer.name;
         }
         return fillPlaceholders(placeholder, kickMsg, brand, host, port, origBrand, conServer);
     }
@@ -123,7 +124,7 @@ public class Connection {
         System.out.println(fillPlaceholders("backend.disconnect", plain(message), plr.brand));
         connectedServer = null;
         if (lastServer != null){
-            connect(lastServer);
+            connect(lastServer.name);
             lastServer = null;
             return;
         }
@@ -157,19 +158,20 @@ public class Connection {
     }
     public void connect(String server){
         if (isClosed) return;
+        ServerDefinition serverInfo = Main.servers.get(server);
+
         // if we are in PLAY state, send a reconfiguration if the protocol is 1.20.2+
         if (conType == ConnectionTypes.PLAY && protocol.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2)){
-            waitingServer = server;
+            waitingServer = serverInfo;
             writePacket(new EnterConfiguration());
             return; // this will continue the connection after (inside of PlayHandler)
         }
-        lastServer = connectedServer;
-        connectedServer = server;
-        ArrayList<Object> serverInfo = Main.servers.get(server);
-        String host = (String) serverInfo.get(0);
-        Integer port = (Integer) serverInfo.get(1);
 
-        Connection con = new ServerConnection().connect(this, HandshakeIntent.LOGIN, host, port,server);
+        lastServer = connectedServer;
+
+        connectedServer = serverInfo;
+
+        Connection con = new ServerConnection().connect(this, HandshakeIntent.LOGIN, serverInfo);
         if (con == null){
             connectedServer = null;
         }
