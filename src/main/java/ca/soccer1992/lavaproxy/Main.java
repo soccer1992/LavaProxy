@@ -7,6 +7,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,19 +48,15 @@ public class Main {
         translations.put("command.server.default_msg","<aqua>You are currently connected to {serverName}</aqua><newline>");
 
         File config = new File("config.toml");
+
         if (!config.exists()) {
-            Files.writeString(config.toPath(), """
-            tries = ["lobby"]
-            
-            [servers]
-            lobby = "localhost:25565"
-            [logging]
-            errors = false
-            pings = true
-            [settings]
-            motd = "A LavaProxy proxy.<newline>Total connections: {conAmount}"
-            port = 25577
-            """);
+            try (InputStream in = Main.class.getResourceAsStream("/config.yml")) {
+                if (in == null) {
+                    throw new IOException("Missing config.yml resource");
+                }
+
+                Files.copy(in, config.toPath());
+            }
         }
         Toml toml = new Toml().read(config);
         Toml logging = toml.getTable("logging");

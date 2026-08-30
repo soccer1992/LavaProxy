@@ -1,0 +1,10 @@
+tries = ["lobby"]
+
+[servers]
+lobby = "localhost:25565"
+[logging]
+errors = false
+pings = true
+[settings]
+motd = "A LavaProxy proxy.<newline>Total connections: {conAmount}"
+port = 25577
