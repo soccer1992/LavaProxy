@@ -6,7 +6,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
 
-import javax.naming.Name;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
@@ -58,6 +57,7 @@ public class Main {
             pings = true
             [settings]
             motd = "A LavaProxy proxy.<newline>Total connections: {conAmount}"
+            port = 25577
             """);
         }
         Toml toml = new Toml().read(config);
@@ -67,6 +67,7 @@ public class Main {
         logErrors = logging.getBoolean("errors");
         logPings = logging.getBoolean("pings");
         trys = toml.getList("tries").toArray(new String[0]);
+        int hostPort = settings.getLong("port",25577L).intValue();
         Map<String, Object> servs = toml.getTable("servers").toMap();
         for (String i : servs.keySet()){
             String ip = toml.getTable("servers").getString(i);
@@ -104,7 +105,7 @@ public class Main {
         //System.out.println(root.);
         //NBTWriter.write(root, new FileOutputStream("world.dat"), false, true); // true = gzip
 
-        new NettyServer(25577).start();
+        new NettyServer(hostPort).start();
 
     }
 }
