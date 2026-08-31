@@ -9,10 +9,15 @@ import java.util.List;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 
 public class NettyFrameDecoder extends ByteToMessageDecoder {
-
+    public static final int MAX_BUF_SIZE = 10 * 1024 * 1024;
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         Connection conRef = ctx.channel().attr(Main.READER).get();
+        if (byteBuf.readableBytes() > MAX_BUF_SIZE) {
+            conRef.close();
+            byteBuf.clear();
+            return;
+        }
         byteBuf.markReaderIndex();
 
         if (byteBuf.readableBytes() < 1) return;
