@@ -38,7 +38,6 @@ public class PlayHandler extends Handler{
     public boolean handle(Packet p, Connection c){
         //System.out.printf("[IN] " + p.getClass().getSimpleName() + " ");
 
-        if (c.backendConnection == null) return true;
         if (p instanceof EnterConfiguration){
             c.setReader(new ConfigReader());
             c.conType = ConnectionTypes.CONFIG;
@@ -60,6 +59,8 @@ public class PlayHandler extends Handler{
             }
             return true;
         }
+        if (c.backendConnection == null) return true;
+
         if (p instanceof UnsignedChat packet){
             if (packet.msg.startsWith("/")){
                 if (!c.plr.executeCommand(packet.msg.substring(1))) c.backendConnection.writePacketServer(packet);
