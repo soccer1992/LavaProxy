@@ -30,6 +30,8 @@ public class Main {
     public static final HashMap<String, ServerDefinition> servers = new HashMap<>();
     public static boolean logErrors;
     public static boolean logPings;
+    public static boolean logCommands;
+
     public static int CON_AMOUNT = 0;
     public static final Map<UUID, Player> players = new ConcurrentHashMap<>();
     public static String forwardType = "none";
@@ -38,6 +40,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
         translations.put("log.ping","{ip} has pinged");
+        translations.put("log.command","{player} has ran command: {command}");
+
         translations.put("backend.transfer","{player} is getting transfered to: {host}:{port}");
         translations.put("log.connect","{player} ({ipHost}) has started login.");
         translations.put("log.connected","{player} has connected to {serverName}.");
@@ -49,7 +53,8 @@ public class Main {
         translations.put("connect.alreadyConnected","<red>You are already connected to this server</red>");
         translations.put("connect.notExist","<red>This server does not exist</red>");
         translations.put("command.server.hover_msg","Connect to {serverName}");
-        translations.put("command.server.default_msg","<aqua>You are currently connected to {serverName}</aqua><newline>");
+        translations.put("command.server.default_msg","<yellow>You are currently connected to {serverName}</yellow>");
+        translations.put("command.server.too_many","<red>There are too many servers to list.</red>");
 
         File config = new File("config.toml");
 
@@ -68,6 +73,8 @@ public class Main {
         Toml serverSettings = toml.getTable("server-settings");
         Toml settings = toml.getTable("settings");
         motd = settings.getString("motd");
+        logCommands = logging.getBoolean("commands");
+
         logErrors = logging.getBoolean("errors");
         logPings = logging.getBoolean("pings");
         trys = toml.getList("tries").toArray(new String[0]);
@@ -92,6 +99,10 @@ public class Main {
         }
         Map<String, Object> servs = toml.getTable("servers").toMap();
         for (String i : servs.keySet()){
+            if (servers.containsKey(i.toLowerCase())){
+                System.out.printf("Error loading server %s: Duplicate server name", i);
+                continue;
+            }
             String ip = toml.getTable("servers").getString(i);
             if (ip.split(":").length > 2){
                 System.out.printf("Error loading server %s: Invalid IP%n", i);

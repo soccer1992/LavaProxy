@@ -215,6 +215,28 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x26),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x2B)
             )
+            //Respawn.class, List.of(
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x07),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x33),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_12, 0x34),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_12_1, 0x35),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_13, 0x38),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_14, 0x3A),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_15, 0x3B),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_16, 0x3A),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_16_2, 0x39),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_17, 0x3D),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x3B),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x3E),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x3D),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x41),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x43),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_3, 0x45),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x47),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x4C),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x4B),
+            //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x50)
+            //)
             );
 
     @Override

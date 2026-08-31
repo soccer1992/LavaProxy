@@ -43,10 +43,18 @@ public class PlayHandler extends Handler{
             c.setReader(new ConfigReader());
             c.conType = ConnectionTypes.CONFIG;
             c.setHandler(new ConfigHandler());
-            if (c.waitingServer!=null){
-                c.backendConnection.close();
-                c.connect(c.waitingServer.name);
+            if (c.waitingServer != null) {
+                String server = c.waitingServer.name;
                 c.waitingServer = null;
+
+                Connection oldBackend = c.backendConnection;
+                c.backendConnection = null;
+
+                if (oldBackend != null && !oldBackend.isClosed) {
+                    oldBackend.close();
+                }
+
+                c.connect(server);
             } else {
                 c.backendConnection.writePacketServer(p);
             }

@@ -37,7 +37,7 @@ public class ComponentUtils {
     public static BinaryTag nbt(Component comp, MinecraftVersions ver){
         // convert to JSON
         JsonElement gson = serializerForVersion(ver).serializeToTree(comp);
-        System.out.println(serialize(gson));
+        //System.out.println(serialize(gson));
         return serialize(gson);
     }
 

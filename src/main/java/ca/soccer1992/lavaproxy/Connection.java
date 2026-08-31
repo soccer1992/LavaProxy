@@ -79,9 +79,9 @@ public class Connection {
         if (connectedServer != null){
             conServer = connectedServer.name;
         }
-        return fillPlaceholders(placeholder, kickMsg, brand, host, port, origBrand, conServer);
+        return fillPlaceholders(placeholder, kickMsg, brand, host, port, origBrand, conServer, "");
     }
-    public String fillPlaceholders(String placeholder, String kickMsg, String brand, String host, int port, String origBrand, String customServerName){
+    public String fillPlaceholders(String placeholder, String kickMsg, String brand, String host, int port, String origBrand, String customServerName, String command){
         placeholder = selfTranslations.getOrDefault(placeholder,placeholder);
 
         String addrThing = "";
@@ -100,43 +100,60 @@ public class Connection {
                 .replace("{host}", host)
                 .replace("{port}",port+"")
                 .replace("{conAmount}",Main.CON_AMOUNT+"")
-                .replace("{backendBrand}",origBrand);
+                .replace("{backendBrand}",origBrand)
+                .replace("{command}", command);
     }
 
-    public void backendDisconnect(Component message){
+    public void backendDisconnect(Component message) {
 
-        if (isBackend){
-
+        if (isBackend) {
             backendConnection.backendDisconnect(message);
-
             return;
         }
-        if (isClosed || hasDisconnected) return;
 
-        if (!backendConnection.isClosed){
-            backendConnection.close();
-        }
-        if (isRetrying) return;
+        if (isClosed || hasDisconnected || isRetrying) return;
+
         isRetrying = true;
-        backendConnection = null;
-        _recentDisconnectMessage = parser.deserialize(fillPlaceholders("backend.player.disconnect", miniMessage(message), plr.brand)); //Component.text("You have been disconnected from " + connectedServer + ": ").color(NamedTextColor.RED).append(message);
 
-        System.out.println(fillPlaceholders("backend.disconnect", plain(message), plr.brand));
+        Connection oldBackend = backendConnection;
+        backendConnection = null;
+
+        if (oldBackend != null && !oldBackend.isClosed) {
+            oldBackend.close();
+        }
+
+        _recentDisconnectMessage =
+                parser.deserialize(
+                        fillPlaceholders(
+                                "backend.player.disconnect",
+                                miniMessage(message),
+                                plr.brand
+                        )
+                );
+
+        System.out.println(
+                fillPlaceholders(
+                        "backend.disconnect",
+                        plain(message),
+                        plr.brand
+                )
+        );
+
         connectedServer = null;
-        if (lastServer != null){
+
+        if (lastServer != null) {
             connect(lastServer.name);
             lastServer = null;
             return;
         }
-        if (!tryIter.hasNext()){
 
+        if (!tryIter.hasNext()) {
             noLogDisconnect(_recentDisconnectMessage);
         } else {
             String next = tryIter.next();
             connect(next);
             isRetrying = false;
         }
-
     }
     // to make a lot of random junk very easier
     public Connection(Channel c){

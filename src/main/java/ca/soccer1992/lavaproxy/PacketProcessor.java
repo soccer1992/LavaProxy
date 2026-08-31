@@ -47,11 +47,12 @@ public class PacketProcessor extends ChannelDuplexHandler {
                     byte[] tmp = new byte[read.readableBytes()];
                     read.readBytes(tmp);
                     byte[] decompressed = decompress(tmp, compLength);
+                    read.release();
+
                     if (decompressed == null){
                         con.close();
                         return;
                     }
-                    read.release();
                     read = ctx.alloc().buffer();
                     read.writeBytes(decompressed);
                     release = read;
@@ -66,7 +67,7 @@ public class PacketProcessor extends ChannelDuplexHandler {
             ctx.fireChannelRead(p);
 
         } catch (Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
             con.disconnect(Component.text(e.toString()), true);
         } finally{
             if (release.refCnt() > 0) release.release();

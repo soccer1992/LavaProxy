@@ -79,6 +79,8 @@ public class Player {
         return false;
     }
     public boolean executeCommand(String command){
+        if (Main.logCommands) System.out.println(con.fillPlaceholders("log.command", "", brand, "", 0, "", con.connectedServer.name, "/" + command));
+
         String rootCmd = command.split(" ")[0];
         if (getCommand(rootCmd) == null) {
             return false;
