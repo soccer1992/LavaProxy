@@ -3,6 +3,7 @@ import ca.soccer1992.lavaproxy.commands.ServerCommand;
 import ca.soccer1992.lavaproxy.types.ServerDefinition;
 import com.moandjiezana.toml.Toml;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.tree.CommandNode;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
@@ -21,8 +22,10 @@ public class Main {
     public static final AttributeKey<Connection> BACKEND =
             AttributeKey.valueOf("backend");
     public static String[] trys = null;
+    public static String[] defaultPermissions = null;
+
     public static final HashMap<String, String> translations = new HashMap<>();
-    public static CommandDispatcher<Player> dispatcher = new CommandDispatcher<>();
+    public static CommandDispatcher<CommandSender> dispatcher = new CommandDispatcher<>();
     public static final EventLoopGroup nettyGroup = new NioEventLoopGroup();
     public static final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
     public static String motd;
@@ -31,30 +34,17 @@ public class Main {
     public static boolean logErrors;
     public static boolean logPings;
     public static boolean logCommands;
-
+    public static int compressionThreshold;
     public static int CON_AMOUNT = 0;
     public static final Map<UUID, Player> players = new ConcurrentHashMap<>();
     public static String forwardType = "none";
     public static String forwardKey = "";
-
-    public static void main(String[] args) throws Exception {
-        translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
-        translations.put("log.ping","{ip} has pinged");
-        translations.put("log.command","{player} has ran command: {command}");
-
-        translations.put("backend.transfer","{player} is getting transfered to: {host}:{port}");
-        translations.put("log.connect","{player} ({ipHost}) has started login.");
-        translations.put("log.connected","{player} has connected to {serverName}.");
-        translations.put("error.unsupported","<red>Your protocol is too old/new for LavaProxy.</red>");
-        translations.put("log.disconnect","{player} has disconnected for: {message}");
-        translations.put("log.brand","{player} brand: {brand}");
-        translations.put("backend.disconnect","{player} has disconnected from {serverName}: {message}");
-        translations.put("backend.brand","{backendBrand} [LavaProxy]");
-        translations.put("connect.alreadyConnected","<red>You are already connected to this server</red>");
-        translations.put("connect.notExist","<red>This server does not exist</red>");
-        translations.put("command.server.hover_msg","Connect to {serverName}");
-        translations.put("command.server.default_msg","<yellow>You are currently connected to {serverName}</yellow>");
-        translations.put("command.server.too_many","<red>There are too many servers to list.</red>");
+    public static UUID session_id = UUID.randomUUID(); // whoever made this at mojang needs to be fired, WHY DO I HAVE TO DO THIS
+    public static CommandNode getCommand(String cmd){
+        return dispatcher.getRoot().getChild(cmd);
+    }
+    public static int loadConfig() throws IOException {
+        servers.clear();
 
         File config = new File("config.toml");
 
@@ -73,14 +63,15 @@ public class Main {
         Toml serverSettings = toml.getTable("server-settings");
         Toml settings = toml.getTable("settings");
         motd = settings.getString("motd");
+        compressionThreshold = settings.getLong("network-compression", 256L).intValue();
         logCommands = logging.getBoolean("commands");
 
         logErrors = logging.getBoolean("errors");
         logPings = logging.getBoolean("pings");
         trys = toml.getList("tries").toArray(new String[0]);
-        int hostPort = settings.getLong("port",25577L).intValue();
         forwardType = serverSettings.getString("forward-mode", "").toLowerCase();
         forwardKey = serverSettings.getString("forward-key", "");
+        defaultPermissions = serverSettings.getList("permissions").toArray(new String[0]);
 
         switch (forwardType){
             case "none":
@@ -116,9 +107,13 @@ public class Main {
                 continue;
             }
             ServerDefinition definition =  new ServerDefinition(i.toLowerCase(), ipport[0],Integer.parseInt(port));
-            definition.forwardType = forwardType;
-            definition.forwardKey = forwardKey;
-
+            if (toml.containsTable("overrides." + definition.name)){
+                Toml override = toml.getTable("overrides." + definition.name);
+                definition.forwardKey = override.getString("forward-key", forwardKey);
+                definition.forwardType = override.getString("forward-mode", forwardType);
+                definition.defaultPermissions = override.getList("permissions", Arrays.asList(defaultPermissions))
+                        .toArray(new String[0]);
+            }
             servers.put(i.toLowerCase(), definition);
         }
         ArrayList<String> newTrys = new ArrayList<>();
@@ -134,17 +129,39 @@ public class Main {
         if (trys.length == 0) System.out.println("[WARN] No tries loaded, connections will fail!");
         if (servers.isEmpty()) System.out.println("[WARN] No servers loaded, connections will fail!");
         System.out.println("Loaded " + servers.size() + " server(s).");
-        dispatcher.register(
-                ServerCommand.create()
-        );
+        return settings.getLong("port",25577L).intValue();
+    }
+    public static void main(String[] args) throws Exception {
+        translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
+        translations.put("log.ping","{ip} has pinged");
+        translations.put("log.command","{player} has ran command: {command}");
+
+        translations.put("backend.transfer","{player} is getting transfered to: {host}:{port}");
+        translations.put("log.connect","{player} ({ipHost}) has started login.");
+        translations.put("log.connected","{player} has connected to {serverName}.");
+        translations.put("error.unsupported","<red>Your protocol is too old/new for LavaProxy.</red>");
+        translations.put("log.disconnect","{player} has disconnected for: {message}");
+        translations.put("log.brand","{player} brand: {brand}");
+        translations.put("backend.disconnect","{player} has disconnected from {serverName}: {message}");
+        translations.put("backend.brand","{backendBrand} [LavaProxy]");
+        translations.put("connect.alreadyConnected","<red>You are already connected to this server</red>");
+        translations.put("connect.notExist","<red>This server does not exist</red>");
+        translations.put("command.server.hover_msg","Connect to {serverName}");
+        translations.put("command.server.default_msg","<yellow>You are currently connected to {serverName}</yellow>");
+        translations.put("command.server.too_many","<red>There are too many servers to list.</red>");
+        translations.put("command.noPermission","<red>You do not have permission to run this command.</red>");
 
         //System.out.println(root.value.values());
         //root = new CompoundTag("root");
         //root.put(new StringTag("name","hello"));
         //System.out.println(root.);
         //NBTWriter.write(root, new FileOutputStream("world.dat"), false, true); // true = gzip
+        System.out.println("Loading configuration");
+        int port = loadConfig();
 
-        new NettyServer(hostPort).start();
+        dispatcher.register(ServerCommand.create());
+
+        new NettyServer(port).start();
 
     }
 }

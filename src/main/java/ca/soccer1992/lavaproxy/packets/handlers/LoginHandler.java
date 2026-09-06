@@ -1,6 +1,7 @@
 package ca.soccer1992.lavaproxy.packets.handlers;
 
 import ca.soccer1992.lavaproxy.Connection;
+import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
@@ -10,6 +11,8 @@ import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
 import ca.soccer1992.lavaproxy.packets.server.LoginAck;
 import ca.soccer1992.lavaproxy.packets.server.LoginStart;
 import ca.soccer1992.lavaproxy.packets.server.PluginResponse;
+
+import java.util.UUID;
 
 
 public class LoginHandler extends Handler{
@@ -22,14 +25,17 @@ public class LoginHandler extends Handler{
             }
             c.plr.setName(packet.playerName);
             c.plr.setUUID(packet.uuid);
-            //c.sendCompression(256);
+            c.sendCompression(Main.compressionThreshold);
 
             System.out.println(c.fillPlaceholders("log.connect", "", ""));
-
+            if (Main.players.isEmpty()){
+                Main.session_id = UUID.randomUUID();
+            }
             //System.out.printf("Player %s (%s) has started login%n",c.plr, c.addr.getHostString());
             LoginSuccess success = new LoginSuccess();
             success.setName(c.plr.name);
             success.setUUID(c.plr.uuid);
+            success.setSessionUUID(Main.session_id);
             //if (c.protocol.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
             //    //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing (<1.20.2 LOGIN KICK)</rainbow>"),false);
             //    //c.connect(c.tryIter.next());

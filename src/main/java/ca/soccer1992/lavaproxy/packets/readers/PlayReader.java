@@ -34,7 +34,8 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_3, 0x10),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x12),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x14),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x15)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x15),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x16)
 
 
             ),
@@ -55,7 +56,9 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_3, 0x15),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x18),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x1A),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x1B)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x1B),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x1C)
+
             ),
             UnsignedChat.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x01),
@@ -74,19 +77,25 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x04),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x05),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x06),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x07)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x07),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x08)
+
             ),
             UnsignedCommand.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x04),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x05),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x06)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x06),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x07)
+
             ),
             EnterConfiguration.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x0B),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0C),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x0E),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x0F)
-            )
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x0F),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x10)
+
+                    )
     );
     public Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of(
             ca.soccer1992.lavaproxy.packets.client.UnsignedChat.class, List.of(
@@ -128,7 +137,9 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x6C),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x73),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x72),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x77)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x77),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x79)
+
             ),
             EnterConfiguration.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x65),
@@ -136,9 +147,10 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x69),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x70),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x6F),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x74)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x74),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x76)
 
-                    ),
+            ),
             ClientInfo.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x15),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x04),
@@ -152,7 +164,8 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x09),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0A),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x0C),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x0D)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x0D),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x0E)
 
             ),
             PluginMessage.class, List.of(
@@ -173,7 +186,7 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x19),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x18)
 
-                    ),
+            ),
             Login.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x01),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x23),
@@ -191,7 +204,9 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x2B),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x2C),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x2B),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x30)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x30),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x31)
+
             ),
             BundleDelimiter.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x00)
@@ -213,7 +228,8 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x26),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x27),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x26),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x2B)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x2B),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x2C)
             )
             //Respawn.class, List.of(
             //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x07),

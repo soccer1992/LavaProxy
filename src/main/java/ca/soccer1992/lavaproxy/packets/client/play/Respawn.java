@@ -92,4 +92,21 @@ public class Respawn extends Packet {
 
     buf.writeByte(dataToKeep);
   }
+
+  public static Respawn fromLogin(Login login) {
+    Respawn r = new Respawn();
+    r.dimension = login.dimension;
+    r.dimensionID = login.dimensionID;
+    r.levelName = login.levelName;
+    r.seedHash = login.seedHash;
+    r.gamemode = login.gamemode;
+    r.oldGamemode = login.oldGamemode;
+    r.debugWorld = login.debugWorld;
+    r.flatWorld = login.flatWorld;
+    r.deathPos = login.deathPos;
+    r.portalCooldown = login.portalCooldown;
+    r.seaLevel = login.seaLevel;
+    r.dataToKeep = 0;
+    return r;
+  }
 }

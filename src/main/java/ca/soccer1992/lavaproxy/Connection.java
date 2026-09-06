@@ -48,10 +48,11 @@ public class Connection {
     public Map<String, Integer> _dimensionMap = null;
     public Map<Long, Long> keepAliveList = new HashMap<>();
     public CompoundBinaryTag _dimensionCodec = null;
+    public List<String> _knownDimensions = null;
     public CompoundBinaryTag _dimInfo = null;
     public boolean _waitingForClientInfo = false;
     public boolean isRetrying = false;
-    public Component _recentDisconnectMessage;
+    public Component _recentDisconnectMessage = Component.empty();
     public Iterator<String> tryIter = Arrays.stream(Main.trys).iterator();
     public Map<String, String> selfTranslations = Main.translations;
     public void setCompression(int amt){
@@ -121,15 +122,16 @@ public class Connection {
         if (oldBackend != null && !oldBackend.isClosed) {
             oldBackend.close();
         }
-
-        _recentDisconnectMessage =
+        if (!_recentDisconnectMessage.equals(Component.empty())) _recentDisconnectMessage = _recentDisconnectMessage.append(Component.newline());
+        _recentDisconnectMessage = _recentDisconnectMessage.append(
                 parser.deserialize(
                         fillPlaceholders(
                                 "backend.player.disconnect",
                                 miniMessage(message),
                                 plr.brand
                         )
-                );
+                )
+        );
 
         System.out.println(
                 fillPlaceholders(
@@ -237,6 +239,7 @@ public class Connection {
             buf.release();
             return;
         }
+
         writeVarInt(cID, buf);
         _writePacket(p, buf);
         buf.release();

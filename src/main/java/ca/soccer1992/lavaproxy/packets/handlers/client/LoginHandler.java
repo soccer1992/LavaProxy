@@ -18,6 +18,7 @@ import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
 import ca.soccer1992.lavaproxy.packets.server.LoginAck;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.kyori.adventure.text.Component;
 
 import java.util.Arrays;
 
@@ -51,8 +52,8 @@ public class LoginHandler extends Handler {
                 c.setHandler(new PlayHandler());
                 //return true;
                 c.backendConnection.tryIter = Arrays.stream(Main.trys).iterator();
-                if (Main.trys[0].equals(c.backendConnection.connectedServer)) c.backendConnection.tryIter.next();
-                c.backendConnection._recentDisconnectMessage = null;
+                if (Main.trys[0].equals(c.backendConnection.connectedServer.name)) c.backendConnection.tryIter.next();
+                c.backendConnection._recentDisconnectMessage = Component.empty();
             }
 
             if (c.protocol.getProtocol()>= MinecraftVersions.MINECRAFT_1_20_2.getProtocol()) {

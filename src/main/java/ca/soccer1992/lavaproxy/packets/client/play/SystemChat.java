@@ -10,8 +10,6 @@ import net.kyori.adventure.text.Component;
 
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.nbt;
-import static ca.soccer1992.lavaproxy.utils.NBTUtil.deserialize;
-import static ca.soccer1992.lavaproxy.utils.NBTUtil.serialize;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 
 public class SystemChat extends Packet {
@@ -23,22 +21,17 @@ public class SystemChat extends Packet {
         BinaryTag tag = readTag(buf, proto);
         message = ComponentUtils.fromNBT(tag);
         if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_19_1)){
-            isActionBar = buf.readBoolean();
+            int b = buf.readUnsignedByte();
+            isActionBar = b != 0;
         } else {
             isActionBar = readVarInt(buf) == 1;
 
         }
     }
 
-    public void encode (ByteBuf buf, MinecraftVersions proto){
-
+    public void encode(ByteBuf buf, MinecraftVersions proto){
         writeTag(buf, proto, nbt(message, proto));
-        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_19_1)){
-            buf.writeBoolean(isActionBar);
-        } else {
-            writeVarInt(isActionBar ? 1 : 0, buf);
-
-        }
+        buf.writeBoolean(isActionBar);
     }
 
 }

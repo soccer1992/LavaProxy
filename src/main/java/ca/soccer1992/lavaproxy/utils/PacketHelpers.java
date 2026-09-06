@@ -1,6 +1,7 @@
 package ca.soccer1992.lavaproxy.utils;
 
 import ca.soccer1992.lavaproxy.MinecraftVersions;
+import ca.soccer1992.lavaproxy.types.GameProperty;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -16,6 +17,7 @@ import net.kyori.adventure.text.serializer.json.legacyimpl.NBTLegacyHoverEventSe
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -120,6 +122,16 @@ public class PacketHelpers {
         if (ver.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_3)) return PRE_1_21_5_SERIALIZER;
         if (ver.isGreaterEquals(MinecraftVersions.MINECRAFT_1_16)) return PRE_1_20_3_SERIALIZER;
         return PRE_1_16_SERIALIZER;
+    }
+    public static ArrayList<GameProperty> readPropertyArray(ByteBuf buf, MinecraftVersions ver){
+        ArrayList<GameProperty> properties = new ArrayList<>();
+        int length = readVarInt(buf);
+        for (int i=0;i<length;i++) properties.add(GameProperty.read(buf, ver));
+        return properties;
+    }
+    public static void writePropertyArray(ByteBuf buf, MinecraftVersions ver, ArrayList<GameProperty> properties){
+        writeVarInt(properties.size(), buf);
+        for (GameProperty i : properties) i.write(buf, ver);
     }
     public static BinaryTag readTag(ByteBuf buf, MinecraftVersions ver){
         BinaryTagType<? extends BinaryTag> type = BINARY_TAG_TYPES[buf.readByte()];

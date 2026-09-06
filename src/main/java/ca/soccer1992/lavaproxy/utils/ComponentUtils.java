@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import net.kyori.adventure.nbt.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer;
 import net.kyori.adventure.text.serializer.json.*;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -18,6 +19,7 @@ import static ca.soccer1992.lavaproxy.utils.PacketHelpers.serializerForVersion;
 
 public class ComponentUtils {
     public static MiniMessage parser = MiniMessage.miniMessage();
+    public static ANSIComponentSerializer ansi = ANSIComponentSerializer.ansi();
     public static String json(Component comp) {
         return JSONComponentSerializer.json().serialize(comp);
     }

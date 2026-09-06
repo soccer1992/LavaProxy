@@ -8,11 +8,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 public class NettyServer {
 
     private final int port;
+    public Channel serverChannel;
 
     public NettyServer(int port) {
         this.port = port;
     }
-
+    public void stop() {
+        if (serverChannel != null) {
+            serverChannel.close();
+        }
+    }
     public void start() throws Exception {
         EventLoopGroup bossGroup = Main.bossGroup;
         EventLoopGroup workerGroup = Main.nettyGroup;
@@ -38,6 +43,7 @@ public class NettyServer {
             ChannelFuture future = bootstrap.bind(port).sync();
             System.out.printf("[Main] Server started on port %s%n", port);
             System.out.println("Done, players can now connect!");
+            serverChannel = future.channel();
             future.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();

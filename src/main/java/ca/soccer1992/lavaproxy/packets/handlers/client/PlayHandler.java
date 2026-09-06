@@ -10,6 +10,7 @@ import ca.soccer1992.lavaproxy.packets.clientserver.EnterConfiguration;
 import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.handlers.Handler;
+import net.kyori.adventure.text.Component;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.fromJSON;
 
@@ -31,6 +32,13 @@ public class PlayHandler extends Handler {
             c._dimensionName = packet.dimension;
             c.backendConnection.writePacket(packet);
             System.out.println(c.backendConnection.fillPlaceholders("log.connected", "", c.backendConnection.plr.brand));
+            if (!c.backendConnection._recentDisconnectMessage.equals(Component.empty())) {
+                c.backendConnection.plr.sendMessage(c.backendConnection._recentDisconnectMessage, false);
+            }
+            c.backendConnection._recentDisconnectMessage = Component.empty();
+            for (String permission : c.backendConnection.connectedServer.defaultPermissions){
+                c.backendConnection.plr.permissions.put(permission, true);
+            }
             //c.backendConnection.plr.sendMessage(Component.text("if you see this, it worked."),false);
 
             //c._dimInfo = c._dimensionCodec.getCompoundTag(packet.dimension);

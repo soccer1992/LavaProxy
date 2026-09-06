@@ -10,15 +10,16 @@ import ca.soccer1992.lavaproxy.types.KnownPack;
 import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.CommandNode;
 import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.parser;
 
-public class Player {
+public class Player implements CommandSender {
     public Connection con;
     public String name = null;
     public UUID uuid = null;
@@ -26,7 +27,7 @@ public class Player {
     public ClientInfo infoPacket = null;
     public ArrayList<String> enabled_features = new ArrayList<>();
     public ArrayList<KnownPack> knownPacks;
-    public ArrayList<String> permissions = new ArrayList<>();
+    public Map<String, Boolean> permissions = new HashMap<>();
 
     public void setKnownPacks(ArrayList<KnownPack> knownPack){
         this.knownPacks = knownPack;
@@ -66,35 +67,32 @@ public class Player {
         con.writePacket(p);
     }
     public boolean hasPermission(String permission) {
-        if (permissions.contains(permission)) return true;
-        if (permissions.contains("*")) return true;
-
+        if (permissions.containsKey(permission)) return permissions.get(permission);
         String[] parts = permission.split("\\.");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < parts.length - 1; i++) {
-            if (i > 0) sb.append(".");
-            sb.append(parts[i]);
-            if (permissions.contains(sb + ".*")) return true;
+        for (int i = parts.length - 1; i > 0; i--) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < i; j++) {
+                if (j > 0) sb.append(".");
+                sb.append(parts[j]);
+            }
+            if (permissions.containsKey(sb + ".*")) return permissions.get(sb + ".*");
         }
-        return false;
+        return permissions.getOrDefault("*",false);
     }
     public boolean executeCommand(String command){
         if (Main.logCommands) System.out.println(con.fillPlaceholders("log.command", "", brand, "", 0, "", con.connectedServer.name, "/" + command));
 
         String rootCmd = command.split(" ")[0];
-        if (getCommand(rootCmd) == null) {
+        if (Main.getCommand(rootCmd) == null) {
             return false;
         }
-        ParseResults<Player> results = Main.dispatcher.parse(command, this);
+        ParseResults<CommandSender> results = Main.dispatcher.parse(command, this);
         try {
             return Main.dispatcher.execute(results) == 1;
         } catch (CommandSyntaxException e) {
-            sendMessage(Component.text(e.getMessage()), false);
-            return true;
+            //sendMessage(Component.text(e.getMessage()), false);
+            return false;
         }
-    }
-    public CommandNode getCommand(String cmd){
-        return Main.dispatcher.getRoot().getChild(cmd);
     }
     public void setUUID(UUID uuid){
         this.uuid = uuid;

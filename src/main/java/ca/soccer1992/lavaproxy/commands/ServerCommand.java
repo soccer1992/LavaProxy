@@ -1,5 +1,6 @@
 package ca.soccer1992.lavaproxy.commands;
 
+import ca.soccer1992.lavaproxy.CommandSender;
 import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.Player;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -18,15 +19,20 @@ public final class ServerCommand {
 
   private ServerCommand() {}
 
-  public static LiteralArgumentBuilder<Player> create() {
-    return LiteralArgumentBuilder.<Player>literal("server")
+  public static LiteralArgumentBuilder<CommandSender> create() {
+    return LiteralArgumentBuilder.<CommandSender>literal("server")
+            .requires(sender -> sender.hasPermission("lavaproxy.command.server"))
             .executes(ServerCommand::usage)
-            .then(RequiredArgumentBuilder.<Player, String>argument("server", StringArgumentType.word())
+            .then(RequiredArgumentBuilder.<CommandSender, String>argument("server", StringArgumentType.word())
                     .executes(ServerCommand::transfer));
   }
 
-  private static int usage(CommandContext<Player> ctx) {
-    Player plr = ctx.getSource();
+  private static int usage(CommandContext<CommandSender> ctx) {
+    CommandSender sender = ctx.getSource();
+    if (!(sender instanceof Player plr)){
+      ctx.getSource().sendMessage(Component.text("This command cannot be executed by console."), false);
+      return 1;
+    }
     plr.sendMessage(parser.deserialize(plr.con.fillPlaceholders("command.server.default_msg", "", plr.brand)), false);
     if (Main.servers.size() > 50){
       plr.sendMessage(parser.deserialize(plr.con.fillPlaceholders("command.server.too_many", "", plr.brand)), false);
@@ -68,9 +74,14 @@ public final class ServerCommand {
     return 1;
   }
 
-  private static int transfer(CommandContext<Player> ctx) {
+  private static int transfer(CommandContext<CommandSender> ctx) {
     String server = StringArgumentType.getString(ctx, "server");
-    ctx.getSource().transferToServer(server);
+    if (!(ctx.getSource() instanceof Player plr)){
+      ctx.getSource().sendMessage(Component.text("This command cannot be executed by console."), false);
+      return 1;
+    }
+
+    plr.transferToServer(server);
     return 1;
   }
 }

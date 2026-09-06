@@ -35,7 +35,7 @@ public class Login extends Packet {
     public boolean enforcesSecureChat;
     public CompoundBinaryTag registry;
     public CompoundBinaryTag currentDimensionData;
-
+    public boolean isOnlineMode;
     public ConnectionTypes getType() { return ConnectionTypes.PLAY; }
     public String name = "Login";
     public void decode (ByteBuf buf, MinecraftVersions proto){
@@ -203,7 +203,9 @@ public class Login extends Packet {
             writeVarInt(seaLevel,buf);
             //this.seaLevel = readVarInt(buf);
         }
-
+        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_26_2)){
+            buf.writeBoolean(isOnlineMode);
+        }
         if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_5)) {
             buf.writeBoolean(enforcesSecureChat);
         }
@@ -246,6 +248,9 @@ public class Login extends Packet {
 
         if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_21_2)) {
             this.seaLevel = readVarInt(buf);
+        }
+        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_26_2)){
+            this.isOnlineMode = buf.readBoolean();
         }
 
         if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_5)) {

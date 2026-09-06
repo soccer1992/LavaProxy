@@ -9,6 +9,10 @@ commands = true
 [settings]
 motd = "A LavaProxy proxy.<newline>Total connections: {conAmount}"
 port = 25577
-[server-settings]
+network-compression = 256 # set to -1 to disable, 0 for every packet is compressed, and above zero for the byte threshold.
+[server-settings] # To override settings per-server, create a table with the name being overrides.server-name, all lowercase.
 forward-mode = "none" # none, bungeecord (ip forward), bungeeguard (forward-key)
 forward-key = "" # use for bungeeguard
+permissions = [
+    "lavaproxy.command.server"
+]

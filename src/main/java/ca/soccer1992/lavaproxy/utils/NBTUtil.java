@@ -150,13 +150,13 @@ public class NBTUtil {
                     }
 
                     return ByteArrayBinaryTag.byteArrayBinaryTag(bytes);
-                case 3://BinaryTagTypes.INT:
+                case 3:
                     int[] ints = new int[jsonArray.size()];
                     for (int i = 0; i < ints.length; i++) {
                         ints[i] = jsonArray.get(i).getAsNumber().intValue();
                     }
 
-                    return IntArrayBinaryTag.intArrayBinaryTag(ints);
+                  return IntArrayBinaryTag.intArrayBinaryTag(ints);
                 case 4://BinaryTagTypes.LONG:
                     long[] longs = new long[jsonArray.size()];
                     for (int i = 0; i < longs.length; i++) {
