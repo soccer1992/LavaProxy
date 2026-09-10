@@ -10,4 +10,6 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      dependency-type: "production"
+      # You can change 'production-dependencies' to any name you prefer
+      production-dependencies:
+        dependency-type: "production"
