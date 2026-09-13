@@ -3,10 +3,7 @@ package ca.soccer1992.lavaproxy.packets.readers;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.DefinitionPair;
 import ca.soccer1992.lavaproxy.packets.Packet;
-import ca.soccer1992.lavaproxy.packets.client.login.PluginRequest;
-import ca.soccer1992.lavaproxy.packets.client.login.CompressionPacket;
-import ca.soccer1992.lavaproxy.packets.client.login.LoginKick;
-import ca.soccer1992.lavaproxy.packets.client.login.LoginSuccess;
+import ca.soccer1992.lavaproxy.packets.client.login.*;
 import ca.soccer1992.lavaproxy.packets.server.PluginResponse;
 import ca.soccer1992.lavaproxy.packets.server.*;
 
@@ -23,6 +20,9 @@ public class LoginReader extends Reader {
             ),
             PluginResponse.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_13, 0x02)
+            ),
+            EncryptionResponse.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_8, 0x01)
             )
     );
     public Map<Class<? extends Packet>, List<DefinitionPair>> clientDefinitions = Map.of(
@@ -34,6 +34,9 @@ public class LoginReader extends Reader {
             ),
             LoginSuccess.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_8, 0x02)
+            ),
+            EncryptionRequest.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_8, 0x01)
             ),
             PluginRequest.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_13, 0x04)

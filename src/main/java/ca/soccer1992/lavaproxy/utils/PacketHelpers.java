@@ -109,7 +109,6 @@ public class PacketHelpers {
     private static final int SEGMENT_BITS = 0x7F;
     private static final int CONTINUE_BIT = 0x80;
     public static final int MAX_PACKET_SIZE = 2 * 1024 * 1024;
-    public static final int MAX_BUF_SIZE = 2 * 1024 * 1024;
 
     @SuppressWarnings("unchecked")
     private static final BinaryTagType<? extends BinaryTag>[] BINARY_TAG_TYPES = new BinaryTagType[] {
@@ -132,6 +131,15 @@ public class PacketHelpers {
     public static void writePropertyArray(ByteBuf buf, MinecraftVersions ver, ArrayList<GameProperty> properties){
         writeVarInt(properties.size(), buf);
         for (GameProperty i : properties) i.write(buf, ver);
+    }
+    public static byte[] readByteArray(ByteBuf buf){
+        byte[] bytes = new byte[readVarInt(buf)];
+        buf.readBytes(bytes);
+        return bytes;
+    }
+    public static void writeByteArray(ByteBuf buf, byte[] bytes){
+        writeVarInt(bytes.length, buf);
+        buf.writeBytes(bytes); // come on it doesn't get simpler than that
     }
     public static BinaryTag readTag(ByteBuf buf, MinecraftVersions ver){
         BinaryTagType<? extends BinaryTag> type = BINARY_TAG_TYPES[buf.readByte()];
@@ -229,8 +237,7 @@ public class PacketHelpers {
 
     }
     public static byte[] compress(byte[] data) {
-        try {
-            Deflater deflater = new Deflater();
+        try (Deflater deflater = new Deflater()){
             deflater.setInput(data);
             deflater.finish();
 
@@ -251,9 +258,9 @@ public class PacketHelpers {
     }
 
     public static byte[] decompress(byte[] compressed, int expectedSize) {
-        try {
+        try (Inflater inflater = new Inflater()){
 
-            Inflater inflater = new Inflater();
+
             inflater.setInput(compressed);
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream(expectedSize > 0 ? expectedSize : compressed.length);

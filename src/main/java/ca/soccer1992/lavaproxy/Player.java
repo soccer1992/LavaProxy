@@ -6,6 +6,7 @@ import ca.soccer1992.lavaproxy.packets.client.UnsignedChat;
 import ca.soccer1992.lavaproxy.packets.client.play.SystemChat;
 import ca.soccer1992.lavaproxy.packets.clientserver.EnterConfiguration;
 import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
+import ca.soccer1992.lavaproxy.types.GameProperty;
 import ca.soccer1992.lavaproxy.types.KnownPack;
 import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 import com.mojang.brigadier.ParseResults;
@@ -28,7 +29,7 @@ public class Player implements CommandSender {
     public ArrayList<String> enabled_features = new ArrayList<>();
     public ArrayList<KnownPack> knownPacks;
     public Map<String, Boolean> permissions = new HashMap<>();
-
+    public ArrayList<GameProperty> properties = new ArrayList<>();
     public void setKnownPacks(ArrayList<KnownPack> knownPack){
         this.knownPacks = knownPack;
 

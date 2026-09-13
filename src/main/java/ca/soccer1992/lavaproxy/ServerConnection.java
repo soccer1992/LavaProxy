@@ -12,6 +12,9 @@ import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+
 public class ServerConnection {
     public Connection connect(Connection con, HandshakeIntent intent, ServerDefinition server) {
 
@@ -61,12 +64,15 @@ public class ServerConnection {
                                     switch (server.forwardType){
                                         case "none":
                                             p.setHost(con.connectAddr.getHostString());
+                                            c.plr.setUUID(UUID.nameUUIDFromBytes(
+                                                    ("OfflinePlayer:" + con.plr.name).getBytes(StandardCharsets.UTF_8)
+                                            ));
                                             break;
                                         case "bungeecord":
-                                            p.setHost(ForwardUtils.buildBungeeCordData(con.plr, null));
+                                            p.setHost(ForwardUtils.buildBungeeCordData(con.plr, con.plr.properties));
                                             break;
                                         case "bungeeguard":
-                                            p.setHost(ForwardUtils.buildBungeeGuardData(con.plr, server.forwardKey, null));
+                                            p.setHost(ForwardUtils.buildBungeeGuardData(con.plr, server.forwardKey, con.plr.properties));
                                             break;
                                     }
                                     p.setPort(con.connectAddr.getPort());
@@ -76,7 +82,7 @@ public class ServerConnection {
                                         LoginStart login = new LoginStart();
                                         login.setName(con.plr.name);
                                         login.setUUID(con.plr.uuid);
-                                        c.plr.uuid = con.plr.uuid;
+                                        if (!server.forwardType.equals("none")) c.plr.uuid = con.plr.uuid;
                                         c.plr.name = con.plr.name;
                                         c.plr.brand = con.plr.brand;
                                         c.plr.infoPacket = con.plr.infoPacket;

@@ -1,6 +1,7 @@
 package ca.soccer1992.lavaproxy;
 import ca.soccer1992.lavaproxy.commands.ServerCommand;
 import ca.soccer1992.lavaproxy.types.ServerDefinition;
+import ca.soccer1992.lavaproxy.utils.EncryptionUtils;
 import com.moandjiezana.toml.Toml;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.CommandNode;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.security.KeyPair;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +31,9 @@ public class Main {
     public static final EventLoopGroup nettyGroup = new NioEventLoopGroup();
     public static final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
     public static String motd;
+    public static boolean onlineMode;
+    public static int keySize;
+    public static KeyPair encryptionKey;
 
     public static final HashMap<String, ServerDefinition> servers = new HashMap<>();
     public static boolean logErrors;
@@ -62,10 +67,12 @@ public class Main {
         Toml logging = toml.getTable("logging");
         Toml serverSettings = toml.getTable("server-settings");
         Toml settings = toml.getTable("settings");
+        Toml advanced = toml.getTable("advanced");
+        keySize = advanced.getLong("public-key-size").intValue();
         motd = settings.getString("motd");
         compressionThreshold = settings.getLong("network-compression", 256L).intValue();
+        onlineMode = settings.getBoolean("online-mode");
         logCommands = logging.getBoolean("commands");
-
         logErrors = logging.getBoolean("errors");
         logPings = logging.getBoolean("pings");
         trys = toml.getList("tries").toArray(new String[0]);
@@ -158,7 +165,7 @@ public class Main {
         //NBTWriter.write(root, new FileOutputStream("world.dat"), false, true); // true = gzip
         System.out.println("Loading configuration");
         int port = loadConfig();
-
+        encryptionKey = EncryptionUtils.createRsaPair(keySize);
         dispatcher.register(ServerCommand.create());
 
         new NettyServer(port).start();

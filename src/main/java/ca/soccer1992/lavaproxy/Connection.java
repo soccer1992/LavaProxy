@@ -28,7 +28,7 @@ import java.net.InetSocketAddress;
 import java.util.*;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 public class Connection {
-    private final Channel nChannel;
+    public final Channel nChannel;
     public MinecraftVersions protocol;
     public InetSocketAddress connectAddr;
     public int compressionAmount;
@@ -55,6 +55,8 @@ public class Connection {
     public Component _recentDisconnectMessage = Component.empty();
     public Iterator<String> tryIter = Arrays.stream(Main.trys).iterator();
     public Map<String, String> selfTranslations = Main.translations;
+    public byte[] sharedSecret;
+    public byte[] verifyToken;
     public void setCompression(int amt){
         this.compressionAmount = amt;
     }
