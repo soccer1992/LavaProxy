@@ -1,12 +1,8 @@
 package ca.soccer1992.lavaproxy;
 
-import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
-import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-
-import java.io.InvalidObjectException;
 
 public class ServerHandler extends ChannelInboundHandlerAdapter {
 
@@ -26,7 +22,6 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                 con.close();
             }
         } catch (Exception e){
-            e.printStackTrace();
              con.disconnect(e.getMessage(),true);
         }
 

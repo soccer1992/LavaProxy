@@ -22,11 +22,12 @@ public class PacketProcessor extends ChannelDuplexHandler {
     @Override
     public void channelInactive(ChannelHandlerContext ctx){
         Connection con = ctx.channel().attr(Main.READER).get();
-
-
+        if (!client){
+            if (con.plr.uuid != null)  Main.players.remove(con.plr.uuid, con.plr);
+        }
         if (con.backendConnection != null){
 
-            if (!this.client){
+            if (!client){
                 con.backendConnection.close();
             }
         }

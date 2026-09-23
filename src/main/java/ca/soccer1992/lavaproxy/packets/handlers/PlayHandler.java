@@ -15,6 +15,8 @@ import ca.soccer1992.lavaproxy.packets.server.play.ChatCommand;
 import ca.soccer1992.lavaproxy.packets.server.play.SignedCommand;
 import ca.soccer1992.lavaproxy.packets.server.play.UnsignedChat;
 import ca.soccer1992.lavaproxy.packets.server.play.UnsignedCommand;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 
 import java.util.Arrays;
 
@@ -44,18 +46,25 @@ public class PlayHandler extends Handler{
 
                 Connection oldBackend = c.backendConnection;
                 c.backendConnection = null;
-
                 if (oldBackend != null && !oldBackend.isClosed) {
                     oldBackend.close();
+                    oldBackend.nChannel.closeFuture().addListener(new ChannelFutureListener() {
+                        @Override
+                        public void operationComplete(ChannelFuture future) {
+                            c.connect(server);
+                        }
+                    });
+                } else {
+                    c.connect(server);
                 }
 
-                c.connect(server);
             } else {
                 c.backendConnection.writePacketServer(p);
             }
             return true;
         }
         if (c.backendConnection == null) return true;
+        if (c.waitingServer!=null) return true;
 
         if (p instanceof UnsignedChat packet){
             if (packet.msg.startsWith("/")){

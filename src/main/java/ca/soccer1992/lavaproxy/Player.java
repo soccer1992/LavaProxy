@@ -11,6 +11,7 @@ import ca.soccer1992.lavaproxy.types.KnownPack;
 import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.netty.buffer.Unpooled;
 import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
@@ -35,6 +36,9 @@ public class Player implements CommandSender {
 
     }
     public void transferToServer(String server){
+        if (con.isBackend){
+            throw new RuntimeException("Cannot call transferToServer on a backend connection.");
+        }
         if (server.equals(con.connectedServer.name)){
             sendMessage(parser.deserialize(con.fillPlaceholders("connect.alreadyConnected", "", brand)), false);
             return;
@@ -45,7 +49,13 @@ public class Player implements CommandSender {
         }
 
         con.waitingServer = Main.servers.get(server);
-        con.writePacket(new EnterConfiguration());
+        Connection backend = con.backendConnection;
+
+        con.nChannel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(a -> {
+            backend.nChannel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(b -> {
+                con.writePacket(new EnterConfiguration());
+            });
+        });
     }
     public void sendMessage(Component msg, boolean isActionBar){
         Packet p;

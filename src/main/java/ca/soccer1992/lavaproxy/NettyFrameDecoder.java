@@ -29,6 +29,10 @@ public class NettyFrameDecoder extends ByteToMessageDecoder {
             byteBuf.resetReaderIndex();
             return;
         }
+        if (len < 0){
+            conRef.close();
+            return;
+        }
         if (len > MAX_PACKET_SIZE){
             conRef.close();
             return;

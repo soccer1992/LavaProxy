@@ -14,12 +14,13 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class ServerConnection {
-    public Connection connect(Connection con, HandshakeIntent intent, ServerDefinition server) {
+    public CompletableFuture<Connection> connect(Connection con, HandshakeIntent intent, ServerDefinition server) {
 
         EventLoopGroup group = Main.nettyGroup;
-        final Connection[] throughConnection = {null};
+        final CompletableFuture<Connection> throughConnection = new CompletableFuture<>();
         try {
             Bootstrap bootstrap = new Bootstrap();
 
@@ -32,7 +33,7 @@ public class ServerConnection {
                             ch.setOption(ChannelOption.TCP_NODELAY, true);
                             Connection c = new Connection(ch);
                             ch.attr(Main.READER).set(c);
-                            throughConnection[0] = c;
+                            throughConnection.complete(c);
                             ch.attr(Main.BACKEND).set(con);
                             c.backendConnection = con;
                             con.backendConnection = c;
@@ -47,7 +48,6 @@ public class ServerConnection {
                                 @Override
                                 public void channelInactive(ChannelHandlerContext ctx){
                                     //if (c.heldData.refCnt() > 0) c.heldData.release();
-
                                     if (con.backendConnection == c && c.connectedServer != null && c.connectedServer.equals(server)) { // only disconnect if still the active backend
                                         c.backendConnection.backendDisconnect("Connection closed");
                                     }
@@ -96,7 +96,7 @@ public class ServerConnection {
                                                 && con.conType != ConnectionTypes.PRE_STATUS
                                                 && con.conType != ConnectionTypes.STATUS){
                                             // send a keepalive
-                                            con.sendKeepAlive();
+                                            //con.sendKeepAlive();
                                         }
 
                                     }
@@ -121,6 +121,6 @@ public class ServerConnection {
         } catch (Exception e){
             con.backendDisconnect(e.toString());
         }
-        return throughConnection[0];
+        return throughConnection;
     }
 }

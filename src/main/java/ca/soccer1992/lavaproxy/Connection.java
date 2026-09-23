@@ -27,6 +27,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.*;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 public class Connection {
     public final Channel nChannel;
     public MinecraftVersions protocol;
@@ -113,7 +115,6 @@ public class Connection {
             backendConnection.backendDisconnect(message);
             return;
         }
-
         if (isClosed || hasDisconnected || isRetrying) return;
 
         isRetrying = true;
@@ -146,6 +147,7 @@ public class Connection {
         connectedServer = null;
 
         if (lastServer != null) {
+            isRetrying = false;
             connect(lastServer.name);
             lastServer = null;
             return;
@@ -155,8 +157,9 @@ public class Connection {
             noLogDisconnect(_recentDisconnectMessage);
         } else {
             String next = tryIter.next();
-            connect(next);
             isRetrying = false;
+
+            connect(next);
         }
     }
     // to make a lot of random junk very easier
@@ -180,22 +183,28 @@ public class Connection {
     public void connect(String server){
         if (isClosed) return;
         ServerDefinition serverInfo = Main.servers.get(server);
-
         // if we are in PLAY state, send a reconfiguration if the protocol is 1.20.2+
         if (conType == ConnectionTypes.PLAY && protocol.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2)){
             waitingServer = serverInfo;
             writePacket(new EnterConfiguration());
             return; // this will continue the connection after (inside of PlayHandler)
         }
-
         lastServer = connectedServer;
 
         connectedServer = serverInfo;
 
-        Connection con = new ServerConnection().connect(this, HandshakeIntent.LOGIN, serverInfo);
-        if (con == null){
-            connectedServer = null;
-        }
+        new ServerConnection().connect(this, HandshakeIntent.LOGIN, serverInfo).thenAccept(con -> {
+            if (con == null){
+                connectedServer = null;
+                backendDisconnect(Component.text("Failed to connect to ")
+                        .append(
+                                Component.text(server)
+                        )
+                        .color(NamedTextColor.RED)
+                );
+            }
+        });
+
     }
     public void setProtocol(MinecraftVersions proto){
         this.protocol = proto;
