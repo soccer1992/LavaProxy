@@ -38,21 +38,26 @@ public class SignedCommand extends Packet {
         buf.writeByte(checksum);
 
     }
-    public void decode(ByteBuf buf, MinecraftVersions proto){
+    public void decode(ByteBuf buf, MinecraftVersions proto) {
         msg = readString(buf);
         ts = buf.readLong();
         salt = buf.readLong();
+
         int length = readVarInt(buf);
-        for (int i=0;i<length;i++){
+
+        for (int i = 0; i < length; i++) {
+            String argumentName = readString(buf);
+
+            byte[] signature = new byte[256];
+            buf.readBytes(signature);
+
             Map<String, byte[]> data = new HashMap<>();
-            byte[] arr = new byte[256];
-            buf.readBytes(arr);
-            data.put(readString(buf), arr);
+            data.put(argumentName, signature);
             sigs.add(data);
         }
+
         msgCount = readVarInt(buf);
         acknowledged = readFixedBitSet(buf, 20);
         checksum = buf.readByte();
-
     }
 }
