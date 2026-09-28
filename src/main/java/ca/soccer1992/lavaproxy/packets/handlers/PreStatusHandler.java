@@ -30,8 +30,8 @@ public class PreStatusHandler extends Handler{
             ver.putInt("protocol", protocol);
             info.put("version", ver.build());
             CompoundBinaryTag.Builder players = CompoundBinaryTag.builder();
-            players.putInt("max", Integer.MAX_VALUE);
-            players.putInt("online", Main.CON_AMOUNT);
+            players.putInt("max", Main.CON_AMOUNT);
+            players.putInt("online", Main.players.size());
             info.put("players", players.build());
             CompoundBinaryTag.Builder desc = CompoundBinaryTag.builder();
             if (c.protocol != MinecraftVersions.UNSUPPORTED) {
