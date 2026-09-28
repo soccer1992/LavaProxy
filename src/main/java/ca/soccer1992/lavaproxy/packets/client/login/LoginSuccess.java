@@ -5,6 +5,7 @@ import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.types.GameProfile;
+import ca.soccer1992.lavaproxy.utils.PacketHelpers;
 import io.netty.buffer.ByteBuf;
 
 import java.util.UUID;
@@ -13,34 +14,45 @@ import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 
 public class LoginSuccess extends Packet {
     public Connection con;
-    public UUID uuid;
+    //public UUID uuid;
     public UUID sessionUUID;
-
-    public String plrName;
+    public GameProfile profile;
+    //public String plrName;
 
     public ConnectionTypes getType() { return ConnectionTypes.LOGIN; }
     public String name = "LoginSuccess";
-    public void setUUID(UUID uuid){this.uuid = uuid;}
-    public void setName(String plrName){this.plrName = plrName;}
+    //public void setUUID(UUID uuid){this.uuid = uuid;}
+    //public void setName(String plrName){this.plrName = plrName;}
     public void setSessionUUID(UUID uuid){this.sessionUUID = uuid;}
-
+    public void setProfile(GameProfile profile){this.profile = profile;}
     public void setConnection(Connection con){this.con = con;}
 
     public void decode (ByteBuf buf, MinecraftVersions proto){
         // 1.8
+        UUID uuid;
+        String username;
         if (proto.getProtocol()<MinecraftVersions.MINECRAFT_26_1.getProtocol()) {
 
             if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_16.getProtocol()) {
-                setUUID(UUID.fromString(readString(buf)));
+                uuid = (UUID.fromString(readString(buf)));
             } else {
-                setUUID(readUUID(buf));
+                uuid = (readUUID(buf));
             }
-            setName(readString(buf));
+            username = (readString(buf));
+            setProfile(new GameProfile(
+                    uuid,
+                    username,
+                    proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_19) ? PacketHelpers.readPropertyArray(buf, proto) : null
+            ));
+            if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_20_5.getProtocol()) return;
+            // 1.20.6 strict error handle to 1.21.4
+            if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_21_4.getProtocol()) {
+                buf.readBoolean();
+            }
         } else {
             GameProfile profile = GameProfile.read(buf, proto);
-            setUUID(profile.uuid);
-            setName(profile.name);
             setSessionUUID(readUUID(buf));
+            setProfile(profile);
         }
         // 1.16
 
@@ -49,13 +61,13 @@ public class LoginSuccess extends Packet {
     public void encode(ByteBuf buf, MinecraftVersions proto){
         if (proto.getProtocol()<MinecraftVersions.MINECRAFT_26_1.getProtocol()) {
             if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_16.getProtocol()) {
-                writeString(uuid.toString(), buf);
+                writeString(profile.uuid.toString(), buf);
             } else {
-                writeUUID(uuid, buf);
+                writeUUID(profile.uuid, buf);
             }
-            writeString(plrName, buf);
+            writeString(profile.name, buf);
             if (proto.getProtocol() > MinecraftVersions.MINECRAFT_1_19.getProtocol()) {
-                writeVarInt(0, buf);
+                writePropertyArray(buf, proto, profile.properties);
             }
             if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_20_5.getProtocol()) return;
             // 1.20.6 strict error handle to 1.21.4
@@ -65,7 +77,7 @@ public class LoginSuccess extends Packet {
             }
         } else {
             // WHY IS IT A GAMEPROFILE
-            new GameProfile(uuid, plrName, null).write(buf, proto);
+            profile.write(buf, proto);
             writeUUID(sessionUUID, buf);
         }
     }

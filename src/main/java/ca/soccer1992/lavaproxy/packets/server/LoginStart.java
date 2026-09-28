@@ -1,4 +1,5 @@
 package ca.soccer1992.lavaproxy.packets.server;
+import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
@@ -25,22 +26,21 @@ public class LoginStart extends Packet {
         setUUID(UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8)));
 
         // debug do not leave in prod bro do not do this
-        if (false){ // set to false to disable future me
-            if (proto.getProtocol()<=MinecraftVersions.MINECRAFT_1_19.getProtocol()){
-                return;
-            }
-            if (proto.getProtocol()<MinecraftVersions.MINECRAFT_1_19_3.getProtocol()){
-                buf.readBoolean(); // no sig
-            }
-            if (proto.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
-                buf.readBoolean(); // has UUID
-            }
-
-            setUUID(readUUID(buf));
-
-
-
+        // set to false to disable future me, but its set to true because of ONLINE mode
+        if (proto.getProtocol()<=MinecraftVersions.MINECRAFT_1_19.getProtocol()){
+            return;
         }
+        if (proto.getProtocol()<MinecraftVersions.MINECRAFT_1_19_3.getProtocol()){
+            buf.readBoolean(); // no sig
+        }
+        if (proto.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
+            if (!buf.readBoolean()) return; // no uuid
+        }
+        UUID uuid = readUUID(buf);
+
+
+
+
         //setUUID(readUUID(buf));
     }
     public void encode(ByteBuf buf, MinecraftVersions proto){

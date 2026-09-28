@@ -84,8 +84,12 @@ public class LoginHandler extends Handler{
             Main.session_id = UUID.randomUUID();
         }
         LoginSuccess success = new LoginSuccess();
-        success.setName(c.plr.name);
-        success.setUUID(c.plr.uuid);
+        GameProfile profile = new GameProfile(
+                c.plr.uuid,
+                c.plr.name,
+                null
+        );
+        success.setProfile(profile);
         success.setSessionUUID(Main.session_id);
         //if (c.protocol.getProtocol()<MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
         //    //c.disconnect(ComponentUtils.parser.deserialize("<rainbow>Testing (<1.20.2 LOGIN KICK)</rainbow>"),false);

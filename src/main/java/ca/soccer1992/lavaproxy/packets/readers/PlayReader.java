@@ -17,7 +17,23 @@ import java.util.Map;
 
 public class PlayReader extends Reader {
     public Map<Class<? extends Packet>, List<DefinitionPair>> serverDefinitions = Map.of(
+            ClientInfo.class, List.of(
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x15),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x04),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12, 0x05),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12_1, 0x04),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_14, 0x05),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x07),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x08),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x07),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x08),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x09),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0A),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x0C),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x0D),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x0E)
 
+            ),
             PluginMessage.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x17),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x9),
@@ -151,23 +167,7 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x76)
 
             ),
-            ClientInfo.class, List.of(
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x15),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x04),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12, 0x05),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_12_1, 0x04),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_14, 0x05),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19, 0x07),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_1, 0x08),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_3, 0x07),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_19_4, 0x08),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x09),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0A),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x0C),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_6, 0x0D),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x0E)
 
-            ),
             PluginMessage.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x3f),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_9, 0x18),

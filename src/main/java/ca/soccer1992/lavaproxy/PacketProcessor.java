@@ -65,6 +65,9 @@ public class PacketProcessor extends ChannelDuplexHandler {
                 ctx.close();
                 return;
             }
+            if (read.isReadable()){
+                throw new Exception("Packet was not fully read.");
+            }
             ctx.fireChannelRead(p);
 
         } catch (Exception e){
