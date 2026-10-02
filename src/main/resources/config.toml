@@ -19,3 +19,4 @@ permissions = [
 ]
 [advanced] # only change these if you know what you are doing
 public-key-size = 1024
+session-servers = ["https://sessionserver.mojang.com/session/minecraft/hasJoined"] # all sessionservers must be written with full path, if you get only a domain, just add /session/minecraft/hasJoined, sessionservers are tested from the order you input them.

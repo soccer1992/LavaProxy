@@ -25,6 +25,7 @@ public class Main {
             AttributeKey.valueOf("backend");
     public static String[] trys = null;
     public static String[] defaultPermissions = null;
+    public static String[] sessionServers = null;
 
     public static final HashMap<String, String> translations = new HashMap<>();
     public static CommandDispatcher<CommandSender> dispatcher = new CommandDispatcher<>();
@@ -69,6 +70,7 @@ public class Main {
         Toml settings = toml.getTable("settings");
         Toml advanced = toml.getTable("advanced");
         keySize = advanced.getLong("public-key-size").intValue();
+        sessionServers = advanced.getList("session-servers").toArray(new String[0]);
         motd = settings.getString("motd");
         compressionThreshold = settings.getLong("network-compression", 256L).intValue();
         onlineMode = settings.getBoolean("online-mode");
@@ -142,7 +144,6 @@ public class Main {
         translations.put("backend.player.disconnect","<red>You have been disconnected from {serverName}: {message}</red>");
         translations.put("log.ping","{ip} has pinged");
         translations.put("log.command","{player} has ran command: {command}");
-
         translations.put("backend.transfer","{player} is getting transfered to: {host}:{port}");
         translations.put("log.connect","{player} ({ipHost}) has started login.");
         translations.put("log.connected","{player} has connected to {serverName}.");

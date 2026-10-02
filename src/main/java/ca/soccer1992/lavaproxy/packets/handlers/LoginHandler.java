@@ -31,8 +31,11 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static ca.soccer1992.lavaproxy.utils.EncryptionUtils.RSADecrypt;
 import static ca.soccer1992.lavaproxy.utils.EncryptionUtils.twosComplementHexdigest;
@@ -42,9 +45,10 @@ public class LoginHandler extends Handler{
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
 
-    public static CompletableFuture<GameProfile> checkHasJoined(String username, String serverIdHash) {
+    public static CompletableFuture<GameProfile> checkHasJoined(String username, String serverIdHash, Iterator<String> sessionServerIterator) {
         String url = String.format(
-                "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s",
+                "%s?username=%s&serverId=%s",
+                sessionServerIterator.next(),
                 URLEncoder.encode(username, StandardCharsets.UTF_8),
                 URLEncoder.encode(serverIdHash, StandardCharsets.UTF_8)
         );
@@ -54,7 +58,14 @@ public class LoginHandler extends Handler{
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> {
                     if (response.statusCode() != 200 || response.body().isEmpty()) {
-                        return null; // auth failed
+                        // wait! if the user has a secondary sessionserver, we need to validate that session also, otherwise we wont know.
+                        if (!sessionServerIterator.hasNext()) return null; // auth fail
+
+                        try {
+                            return checkHasJoined(username, serverIdHash, sessionServerIterator).get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                     JsonObject json = gson.fromJson(response.body(), JsonObject.class);
                     UUID uuid = UUID.fromString(
@@ -184,7 +195,7 @@ public class LoginHandler extends Handler{
                 digest.update(c.sharedSecret);
                 digest.update(Main.encryptionKey.getPublic().getEncoded());
                 byte[] hash = digest.digest();
-                checkHasJoined(c.plr.name, twosComplementHexdigest(hash)).thenAcceptAsync(profile -> {
+                checkHasJoined(c.plr.name, twosComplementHexdigest(hash), Arrays.stream(Main.sessionServers).iterator()).thenAcceptAsync(profile -> {
                     if (profile == null) {
                         c.close();
                         return;
