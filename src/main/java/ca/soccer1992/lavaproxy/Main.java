@@ -40,6 +40,9 @@ public class Main {
     public static boolean logErrors;
     public static boolean logPings;
     public static boolean logCommands;
+    public static boolean haProxy;
+    public static boolean haProxyOptional;
+
     public static int compressionThreshold;
     public static int CON_AMOUNT = 0;
     public static final Map<UUID, Player> players = new ConcurrentHashMap<>();
@@ -70,6 +73,10 @@ public class Main {
         Toml settings = toml.getTable("settings");
         Toml advanced = toml.getTable("advanced");
         keySize = advanced.getLong("public-key-size").intValue();
+        haProxy = advanced.getBoolean("haproxy-protocol");
+        haProxyOptional = advanced.getBoolean("optional-haproxy");
+
+        if (haProxy) System.out.println("[WARN] HAProxy protocol is enabled, please firewall this server to prevent IP spoof attacks.");
         sessionServers = advanced.getList("session-servers").toArray(new String[0]);
         motd = settings.getString("motd");
         compressionThreshold = settings.getLong("network-compression", 256L).intValue();

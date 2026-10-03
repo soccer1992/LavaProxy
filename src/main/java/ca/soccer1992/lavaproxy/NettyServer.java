@@ -37,6 +37,10 @@ public class NettyServer {
                             ch.pipeline().addLast(new PacketProcessor(false));
 
                             ch.pipeline().addLast(new ServerHandler());
+                            //ha proxy
+                            if (Main.haProxy){
+                                ch.pipeline().addFirst(new HAProxyHandler());
+                            }
                         }
                     });
 

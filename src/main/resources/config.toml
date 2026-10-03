@@ -20,3 +20,5 @@ permissions = [
 [advanced] # only change these if you know what you are doing
 public-key-size = 1024
 session-servers = ["https://sessionserver.mojang.com/session/minecraft/hasJoined"] # all sessionservers must be written with full path, if you get only a domain, just add /session/minecraft/hasJoined, sessionservers are tested from the order you input them.
+haproxy-protocol = false # Enable the HAProxy proxy protocol
+optional-haproxy = false # only is in effect if haproxy-protocol is set to true, makes HAProxy packets optional
