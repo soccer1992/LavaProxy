@@ -16,12 +16,14 @@ import ca.soccer1992.lavaproxy.packets.readers.ConfigReader;
 import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
 import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
 import ca.soccer1992.lavaproxy.packets.server.LoginAck;
+import ca.soccer1992.lavaproxy.packets.server.PluginResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.kyori.adventure.text.Component;
 
 import java.util.Arrays;
 
+import static ca.soccer1992.lavaproxy.utils.ForwardUtils.buildVelocityData;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.writeString;
 
 public class LoginHandler extends Handler {
@@ -39,10 +41,31 @@ public class LoginHandler extends Handler {
 
             return true;
         }
-        if (p instanceof PluginRequest){
-            c.backendConnection.writePacket(p);
-            return true;
+        if (p instanceof PluginRequest packet) {
 
+            System.out.println(packet.channel);
+            System.out.println(c.backendConnection.connectedServer);
+            System.out.println(c.connectedServer.forwardType);
+            try {
+                if (packet.channel.equals("velocity:player_info") && c.connectedServer.forwardType.equals("velocity")) {
+                    byte maxVersion = packet.data[0];
+                    System.out.println(maxVersion);
+                    PluginResponse response = new PluginResponse();
+                    if (maxVersion < 4) {
+                        // default to type 1
+                        response.setData(buildVelocityData(c.backendConnection.plr, c.connectedServer.forwardKey, c.backendConnection.plr.properties, 1));
+                    } else {
+                        response.setData(buildVelocityData(c.backendConnection.plr, c.connectedServer.forwardKey, c.backendConnection.plr.properties, 4));
+                    }
+                    response.setMessageID(packet.messageID);
+                    c.writePacketServer(response);
+                    return true;
+                }
+                c.backendConnection.writePacket(p);
+            } catch (Exception e){
+                c.close();
+            }
+            return true;
         }
         if (p instanceof LoginSuccess){
 

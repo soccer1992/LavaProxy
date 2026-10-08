@@ -95,12 +95,14 @@ public class Main {
                 // ignore
                 break;
             case "bungeeguard":
+            case "velocity":
                 if (forwardKey.isEmpty()){
                     System.out.println("Forward key is not defined in key-requiring mode! Defaulting to none.");
                 } else {
                     break;
                 }
             default:
+                System.out.println(forwardType);
                 forwardType = "none";
                 break;
         }

@@ -62,6 +62,7 @@ public class ServerConnection {
                                     p.setIntent(intent);
                                     p.setProtocol(con.protocol);
                                     switch (server.forwardType){
+                                        case "velocity":
                                         case "none":
                                             p.setHost(con.connectAddr.getHostString());
                                             c.plr.setUUID(UUID.nameUUIDFromBytes(
@@ -74,6 +75,8 @@ public class ServerConnection {
                                         case "bungeeguard":
                                             p.setHost(ForwardUtils.buildBungeeGuardData(con.plr, server.forwardKey, con.plr.properties));
                                             break;
+                                        default:
+                                            throw new RuntimeException("Invalid forwarding type '" + server.forwardType + "'.");
                                     }
                                     p.setPort(con.connectAddr.getPort());
                                     c.writePacketServer(p);
