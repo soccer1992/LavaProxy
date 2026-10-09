@@ -56,6 +56,10 @@ public class LoginHandler extends Handler{
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                })
                 .thenApply(response -> {
                     if (response.statusCode() != 200 || response.body().isEmpty()) {
                         // wait! if the user has a secondary sessionserver, we need to validate that session also, otherwise we wont know.
@@ -124,6 +128,10 @@ public class LoginHandler extends Handler{
     }
     public boolean handle(Packet p, Connection c){
         if (p instanceof LoginStart packet){
+            if (c.conType == ConnectionTypes.POST_SUCCESS) {
+                c.noLogDisconnect("\"Duplicate LoginStart!!\"");
+                return true;
+            }
             if (!packet.playerName.matches("[a-zA-Z0-9\\p{Punct}]+")){
                 c.noLogDisconnect("\"Invalid player name\"");
                 return true;
@@ -173,6 +181,7 @@ public class LoginHandler extends Handler{
         }
 
         if (p instanceof PluginResponse){
+            if (c.backendConnection==null)return true;
             c.backendConnection.writePacketServer(p);
             return true;
         }
@@ -195,22 +204,18 @@ public class LoginHandler extends Handler{
                 digest.update(c.sharedSecret);
                 digest.update(Main.encryptionKey.getPublic().getEncoded());
                 byte[] hash = digest.digest();
+                c.nChannel.pipeline().addFirst("decrypt", new EncryptionDecoder(c.sharedSecret));
+                c.nChannel.pipeline().addFirst("encrypt", new EncryptionEncoder(c.sharedSecret));
                 checkHasJoined(c.plr.name, twosComplementHexdigest(hash), Arrays.stream(Main.sessionServers).iterator()).thenAcceptAsync(profile -> {
-                    if (profile == null) {
-                        c.close();
+                    if (profile == null) {c.close();
                         return;
                     }
                     c.plr.setUUID(profile.uuid);
+                    c.plr.setName(profile.name);
                     c.plr.properties = profile.properties;
                     // gotta apply the encryption
 
-                    try {
-                        c.nChannel.pipeline().addFirst("decrypt", new EncryptionDecoder(c.sharedSecret));
-                        c.nChannel.pipeline().addFirst("encrypt", new EncryptionEncoder(c.sharedSecret));
-                        continueSuccess(c);
-                    } catch (GeneralSecurityException e) {
-                        throw new RuntimeException(e);
-                    }
+                    continueSuccess(c);
                 }, c.nChannel.eventLoop());
 
 

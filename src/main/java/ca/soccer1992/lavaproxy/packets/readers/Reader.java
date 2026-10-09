@@ -39,6 +39,7 @@ public abstract class Reader {
         Packet p = clazz.getDeclaredConstructor().newInstance();
 
         p.decode(buf, mVer);
+        //System.out.printf("Read packet %s from ID %s (IsClient: %s)%n", p.getClass(), id, forceClient);
         return p;
     }
     public int getPacketFromInfo(MinecraftVersions ver, Class<? extends Packet> packet){

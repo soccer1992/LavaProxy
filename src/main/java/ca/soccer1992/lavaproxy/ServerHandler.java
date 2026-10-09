@@ -18,7 +18,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             //    throw new InvalidObjectException("InvalidPacket cannot be processed inside of non-PLAY states.");
             //}
             if (!con.packetHandler.handle(in, con)) {
-                //System.out.println("Packet was not handled...");
+                //System.out.println("Packet was not handled... " + in.getClass());
                 con.close();
             }
         } catch (Exception e){
