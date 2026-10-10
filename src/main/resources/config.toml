@@ -25,3 +25,6 @@ optional-haproxy = false # only is in effect if haproxy-protocol is set to true,
 # This feature allows special forwarding modes, for incoming connections.
 # This is different from the regular forwarding-mode, as it acts on the client-side connections, and not the backend ones
 # This supports the normal forward-types.
+incoming-forwarding-mode = "none"
+incoming-forwarding-key = "" # read above for more info on this.
+incoming-forwarding-required = true
