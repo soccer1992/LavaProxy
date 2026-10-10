@@ -9,6 +9,7 @@ import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.login.EncryptionRequest;
 import ca.soccer1992.lavaproxy.packets.client.login.LoginSuccess;
+import ca.soccer1992.lavaproxy.packets.client.login.PluginRequest;
 import ca.soccer1992.lavaproxy.packets.readers.ConfigReader;
 import ca.soccer1992.lavaproxy.packets.readers.PlayReader;
 import ca.soccer1992.lavaproxy.packets.server.EncryptionResponse;
@@ -17,10 +18,14 @@ import ca.soccer1992.lavaproxy.packets.server.LoginStart;
 import ca.soccer1992.lavaproxy.packets.server.PluginResponse;
 import ca.soccer1992.lavaproxy.types.GameProfile;
 import ca.soccer1992.lavaproxy.types.GameProperty;
+import ca.soccer1992.lavaproxy.utils.EncryptionUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -30,21 +35,19 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static ca.soccer1992.lavaproxy.utils.EncryptionUtils.RSADecrypt;
 import static ca.soccer1992.lavaproxy.utils.EncryptionUtils.twosComplementHexdigest;
+import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
 
 
 public class LoginHandler extends Handler{
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
-
+    private int velocityMessage = 0;
     public static CompletableFuture<GameProfile> checkHasJoined(String username, String serverIdHash, Iterator<String> sessionServerIterator) {
         String url = String.format(
                 "%s?username=%s&serverId=%s",
@@ -136,8 +139,10 @@ public class LoginHandler extends Handler{
                 c.noLogDisconnect("\"Invalid player name\"");
                 return true;
             }
-            c.plr.setName(packet.playerName);
-            c.plr.setUUID(packet.uuid);
+            if (!c.receivedForwarding) {
+               c.plr.setName(packet.playerName);
+               c.plr.setUUID(packet.uuid);
+            }
             c.sendCompression(Main.compressionThreshold);
 
             System.out.println(c.fillPlaceholders("log.connect", "", ""));
@@ -153,6 +158,16 @@ public class LoginHandler extends Handler{
                 c.writePacket(encryptionRequest);
                 return true;
             }
+            if (Main.incomingForwardType.equals("velocity")){
+                PluginRequest req = new PluginRequest();
+                req.setChannel("velocity:player_info");
+                velocityMessage = new Random().nextInt(1, 5000000);
+                req.setMessageID(velocityMessage);
+                req.setData(new byte[]{0x04});
+                // now send it
+                c.writePacketServer(req);
+
+            }
             continueSuccess(c);
             //System.out.printf("Player %s (%s) has started login%n",c.plr, c.addr.getHostString());
 
@@ -165,6 +180,7 @@ public class LoginHandler extends Handler{
                 c.disconnect("LoginAck sent before LoginSuccess", true);
                 return true;
             }
+
             //System.out.println("switched to config");
             if (c.protocol.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2)) {
                 c.setReader(new ConfigReader());
@@ -175,12 +191,40 @@ public class LoginHandler extends Handler{
                 throw new UnsupportedOperationException("LoginAck somehow sent on <1.20.2? Please report this!");
             }
             //new ServerConnection().connect(c, HandshakeIntent.LOGIN, "127.0.0.1",25565);
-
+            if (!c.receivedForwarding && !Main.incomingForwardOptional && !Main.incomingForwardType.equals("none")){
+                c.disconnect("No forwarding received.", true);
+                return true;
+            }
             c.connect(c.tryIter.next());
             return true;
         }
 
-        if (p instanceof PluginResponse){
+        if (p instanceof PluginResponse packet){
+            if (velocityMessage != 0 && packet.messageID == velocityMessage){
+                ByteBuf buf = Unpooled.wrappedBuffer(packet.data);
+                byte[] sig = new byte[32];
+                buf.readBytes(sig);
+                buf.markReaderIndex();
+                byte[] signed = new byte[buf.readableBytes()];
+                buf.readBytes(signed);
+                buf.resetReaderIndex();
+                try {
+                    byte[] hmac = EncryptionUtils.SHA256HMac(signed, Main.incomingForwardKey);
+                    if (!MessageDigest.isEqual(hmac, sig)){
+                        // they aren't good, YEET IT OUT OF EXISTANCE.
+                        c.close();
+                        return true;
+                    }
+                    int forwardVersion = readVarInt(buf); // well we dont care about the signing key so we do not care.
+                    c.addr = new InetSocketAddress(readString(buf), c.addr.getPort());
+                    c.plr.setUUID(readUUID(buf));
+                    c.plr.setName(readString(buf));
+                    c.plr.properties = readPropertyArray(buf, c.protocol);
+                } catch (Exception e){
+                    c.close();
+                    return true;
+                }
+            }
             if (c.backendConnection==null)return true;
             c.backendConnection.writePacketServer(p);
             return true;

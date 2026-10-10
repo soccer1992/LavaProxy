@@ -59,6 +59,7 @@ public class Connection {
     public Map<String, String> selfTranslations = Main.translations;
     public byte[] sharedSecret;
     public byte[] verifyToken;
+    public boolean receivedForwarding = false;
     public void setCompression(int amt){
         this.compressionAmount = amt;
     }

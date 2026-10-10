@@ -48,6 +48,10 @@ public class Main {
     public static final Map<UUID, Player> players = new ConcurrentHashMap<>();
     public static String forwardType = "none";
     public static String forwardKey = "";
+
+    public static String incomingForwardType = "none";
+    public static String incomingForwardKey = "";
+    public static boolean incomingForwardOptional;
     public static UUID session_id = UUID.randomUUID(); // whoever made this at mojang needs to be fired, WHY DO I HAVE TO DO THIS
     public static CommandNode getCommand(String cmd){
         return dispatcher.getRoot().getChild(cmd);
@@ -102,8 +106,34 @@ public class Main {
                     break;
                 }
             default:
-                System.out.println(forwardType);
                 forwardType = "none";
+                break;
+        }
+
+
+
+        /*
+        incoming-forwarding-mode = "none"
+incoming-forwarding-key = "" # read above for more info on this.
+incoming-forwarding-required = true
+         */
+        incomingForwardType = advanced.getString("incoming-forwarding-mode");
+        incomingForwardKey = advanced.getString("incoming-forwarding-key");
+        incomingForwardOptional = !advanced.getBoolean("incoming-forwarding-required");
+        switch (incomingForwardType){
+            case "none":
+            case "bungeecord":
+                // ignore
+                break;
+            case "bungeeguard":
+            case "velocity":
+                if (incomingForwardKey.isEmpty()){
+                    System.out.println("Forward key is not defined in key-requiring mode! Defaulting to none.");
+                } else {
+                    break;
+                }
+            default:
+                incomingForwardType = "none";
                 break;
         }
         Map<String, Object> servs = toml.getTable("servers").toMap();
