@@ -139,11 +139,11 @@ public class LoginHandler extends Handler{
                 c.noLogDisconnect("\"Invalid player name\"");
                 return true;
             }
-            if (!c.receivedForwarding) {
+            if (!c.receivedForwarding || Main.incomingForwardType.startsWith("bungee")) {
                c.plr.setName(packet.playerName);
                c.plr.setUUID(packet.uuid);
             }
-            c.sendCompression(Main.compressionThreshold);
+            if (Main.compressionThreshold>=0) c.sendCompression(Main.compressionThreshold);
 
             System.out.println(c.fillPlaceholders("log.connect", "", ""));
             if (Main.onlineMode){
