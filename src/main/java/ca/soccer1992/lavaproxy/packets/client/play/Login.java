@@ -229,7 +229,7 @@ public class Login extends Packet {
 
         if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_5)){
             dimensionID = readVarInt(buf);
-            dimension = dimensions.get(dimensionID);
+            //dimension = dimensions.get(dimensionID);
         } else {
             dimension = readString(buf);
         }

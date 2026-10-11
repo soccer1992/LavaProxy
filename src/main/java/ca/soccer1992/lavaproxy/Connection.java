@@ -47,7 +47,7 @@ public class Connection {
     public boolean isBackend = false;
     public boolean hasDisconnected = false;
     public String _dimensionName = null;
-    public Map<String, Integer> _dimensionMap = null;
+    public Map<Integer, String> _dimensionMap = null;
     public Map<Long, Long> keepAliveList = new HashMap<>();
     public CompoundBinaryTag _dimensionCodec = null;
     public List<String> _knownDimensions = null;

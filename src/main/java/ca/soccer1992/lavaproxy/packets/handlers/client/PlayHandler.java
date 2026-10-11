@@ -1,6 +1,7 @@
 package ca.soccer1992.lavaproxy.packets.handlers.client;
 
 import ca.soccer1992.lavaproxy.Connection;
+import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.NBTKick;
@@ -29,6 +30,9 @@ public class PlayHandler extends Handler {
         }
         if (p instanceof Login packet){
             c.backendConnection.lastServer = null;
+            if (c.protocol.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2)){
+               packet.dimension = c._dimensionMap.get(packet.dimensionID);
+            }
             c._dimensionName = packet.dimension;
             c.backendConnection.writePacket(packet);
             System.out.println(c.backendConnection.fillPlaceholders("log.connected", "", c.backendConnection.plr.brand));

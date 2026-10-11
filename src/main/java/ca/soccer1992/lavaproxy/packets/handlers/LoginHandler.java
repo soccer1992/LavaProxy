@@ -165,10 +165,12 @@ public class LoginHandler extends Handler{
                 req.setMessageID(velocityMessage);
                 req.setData(new byte[]{0x04});
                 // now send it
-                c.writePacketServer(req);
+                c.writePacket(req);
+
+            } else {
+                continueSuccess(c);
 
             }
-            continueSuccess(c);
             //System.out.printf("Player %s (%s) has started login%n",c.plr, c.addr.getHostString());
 
 
@@ -201,6 +203,10 @@ public class LoginHandler extends Handler{
 
         if (p instanceof PluginResponse packet){
             if (velocityMessage != 0 && packet.messageID == velocityMessage){
+                if (packet.data == null || packet.data.length == 0){
+                    continueSuccess(c);
+                    return true; // non-velocity
+                }
                 ByteBuf buf = Unpooled.wrappedBuffer(packet.data);
                 byte[] sig = new byte[32];
                 buf.readBytes(sig);
@@ -220,6 +226,9 @@ public class LoginHandler extends Handler{
                     c.plr.setUUID(readUUID(buf));
                     c.plr.setName(readString(buf));
                     c.plr.properties = readPropertyArray(buf, c.protocol);
+                    c.receivedForwarding = true;
+                    continueSuccess(c);
+                    return true;
                 } catch (Exception e){
                     c.close();
                     return true;

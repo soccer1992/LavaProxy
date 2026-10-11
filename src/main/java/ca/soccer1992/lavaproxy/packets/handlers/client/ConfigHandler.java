@@ -51,15 +51,15 @@ public class ConfigHandler extends Handler {
             for (Map.Entry<Identifier, Map<Integer, RegistryPart>> mapping : packet.RegistryData.entrySet()) {
                 if (Objects.equals(mapping.getKey().name(), "dimension_type")) {
                     CompoundBinaryTag.Builder codec = CompoundBinaryTag.builder();
-                    Map<String, Integer> dimMap = new HashMap<>();
+                    Map<Integer, String> dimMap = new HashMap<>();
                     for (RegistryPart part : mapping.getValue().values()) {
+                        dimMap.put(part.id(), part.entry());
                         if (!part.hasNBT()) {
                             continue;
                             //throw new IllegalArgumentException("dimension_type does not have NBT attached to RegistryPart");
                         }
                         BinaryTag t = part.nbt();
                         codec.put(part.entry(), t); // confirmed to have nbt
-                        dimMap.put(part.entry(), part.id());
 
                     }
                     c._dimensionMap = dimMap;
