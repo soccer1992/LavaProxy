@@ -1,6 +1,7 @@
 package ca.soccer1992.lavaproxy.packets.handlers.client;
 
 import ca.soccer1992.lavaproxy.Connection;
+import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
@@ -12,6 +13,8 @@ import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.handlers.Handler;
 import net.kyori.adventure.text.Component;
+
+import java.util.Arrays;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.fromJSON;
 
@@ -43,6 +46,8 @@ public class PlayHandler extends Handler {
             for (String permission : c.backendConnection.connectedServer.defaultPermissions){
                 c.backendConnection.plr.permissions.put(permission, true);
             }
+            c.backendConnection.tryIter = Arrays.stream(Main.trys).iterator();
+            if (Main.trys[0].equals(c.backendConnection.connectedServer.name)) c.backendConnection.tryIter.next();
             //c.backendConnection.plr.sendMessage(Component.text("if you see this, it worked."),false);
 
             //c._dimInfo = c._dimensionCodec.getCompoundTag(packet.dimension);

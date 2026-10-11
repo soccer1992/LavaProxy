@@ -141,7 +141,7 @@ public class LoginHandler extends Handler{
             }
             if (!c.receivedForwarding || Main.incomingForwardType.startsWith("bungee")) {
                c.plr.setName(packet.playerName);
-               c.plr.setUUID(packet.uuid);
+               if (!c.receivedForwarding) c.plr.setUUID(packet.uuid);
             }
             if (Main.compressionThreshold>=0) c.sendCompression(Main.compressionThreshold);
 
