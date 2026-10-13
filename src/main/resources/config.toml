@@ -7,6 +7,7 @@ errors = false
 pings = true
 commands = true
 [settings]
+icon-file = "server-icon.png"
 motd = "A LavaProxy proxy.<newline>Total connections: {conAmount}"
 port = 25577
 network-compression = 256 # set to -1 to disable, 0 for every packet is compressed, and above zero for the byte threshold.

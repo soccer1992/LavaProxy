@@ -33,6 +33,7 @@ public class PreStatusHandler extends Handler{
             players.putInt("max", Main.CON_AMOUNT);
             players.putInt("online", Main.players.size());
             info.put("players", players.build());
+            info.putString("favicon", Main.serverIcon);
             CompoundBinaryTag.Builder desc = CompoundBinaryTag.builder();
             if (c.protocol != MinecraftVersions.UNSUPPORTED) {
                 Component comp = ComponentUtils.parser.deserialize(c.fillPlaceholders(Main.motd, "", ""));

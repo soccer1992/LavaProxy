@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.security.KeyPair;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,6 +53,9 @@ public class Main {
     public static String incomingForwardType = "none";
     public static String incomingForwardKey = "";
     public static boolean incomingForwardOptional;
+
+    public static String serverIcon = "";
+
     public static UUID session_id = UUID.randomUUID(); // whoever made this at mojang needs to be fired, WHY DO I HAVE TO DO THIS
     public static CommandNode getCommand(String cmd){
         return dispatcher.getRoot().getChild(cmd);
@@ -76,6 +80,13 @@ public class Main {
         Toml serverSettings = toml.getTable("server-settings");
         Toml settings = toml.getTable("settings");
         Toml advanced = toml.getTable("advanced");
+        try {
+            byte[] content = Files.readAllBytes(new File(settings.getString("icon-file")).toPath());
+            serverIcon = "data:image/png;base64," + Base64.getEncoder().encodeToString(content);
+        } catch (NoSuchFileException e){
+            System.out.println(settings.getString("icon-file") + " does not exist, defaulting to blank icon.");
+            serverIcon = "";
+        }
         keySize = advanced.getLong("public-key-size").intValue();
         haProxy = advanced.getBoolean("haproxy-protocol");
         haProxyOptional = advanced.getBoolean("optional-haproxy");
