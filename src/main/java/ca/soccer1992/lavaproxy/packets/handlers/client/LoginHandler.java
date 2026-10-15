@@ -42,14 +42,9 @@ public class LoginHandler extends Handler {
             return true;
         }
         if (p instanceof PluginRequest packet) {
-
-            System.out.println(packet.channel);
-            System.out.println(c.backendConnection.connectedServer);
-            System.out.println(c.connectedServer.forwardType);
             try {
                 if (packet.channel.equals("velocity:player_info") && c.connectedServer.forwardType.equals("velocity")) {
                     byte maxVersion = packet.data[0];
-                    System.out.println(maxVersion);
                     PluginResponse response = new PluginResponse();
                     if (maxVersion < 4) {
                         // default to type 1
