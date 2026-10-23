@@ -2,6 +2,7 @@ package ca.soccer1992.lavaproxy.types;
 
 import ca.soccer1992.lavaproxy.MinecraftVersions;
 import io.netty.buffer.ByteBuf;
+import org.jspecify.annotations.NonNull;
 
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.readString;
 import static ca.soccer1992.lavaproxy.utils.PacketHelpers.writeString;
@@ -23,7 +24,7 @@ public record Identifier(String id, String name) {
         }
         return new Identifier(z[0], z[1]);
     }
-    public String toString(){
+    public @NonNull String toString(){
         return id + ":" + name;
     }
 }

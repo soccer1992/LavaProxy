@@ -2,6 +2,7 @@ package ca.soccer1992.lavaproxy.packets.handlers;
 
 import ca.soccer1992.lavaproxy.Connection;
 import ca.soccer1992.lavaproxy.Main;
+import ca.soccer1992.lavaproxy.eventhandlers.PluginMessageEvent;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
@@ -15,6 +16,7 @@ import ca.soccer1992.lavaproxy.packets.server.play.ChatCommand;
 import ca.soccer1992.lavaproxy.packets.server.play.SignedCommand;
 import ca.soccer1992.lavaproxy.packets.server.play.UnsignedChat;
 import ca.soccer1992.lavaproxy.packets.server.play.UnsignedCommand;
+import ca.soccer1992.lavaproxy.types.Identifier;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
@@ -48,12 +50,7 @@ public class PlayHandler extends Handler{
                 c.backendConnection = null;
                 if (oldBackend != null && !oldBackend.isClosed) {
                     oldBackend.close();
-                    oldBackend.nChannel.closeFuture().addListener(new ChannelFutureListener() {
-                        @Override
-                        public void operationComplete(ChannelFuture future) {
-                            c.connect(server);
-                        }
-                    });
+                    oldBackend.nChannel.closeFuture().addListener((ChannelFutureListener) future -> c.connect(server));
                 } else {
                     c.connect(server);
                 }
@@ -96,7 +93,18 @@ public class PlayHandler extends Handler{
             return true;
         }
         if (p instanceof PluginMessage packet) {
-            c.backendConnection.writePacketServer(packet);
+            PluginMessageEvent event = new PluginMessageEvent();
+            event.channel = Identifier.read(packet.channel);
+            event.fromBackend = false;
+            event.data = packet.data;
+            event.originatingPacket = packet;
+            event.cancel = false;
+            event.player = c.plr;
+            for (ca.soccer1992.lavaproxy.eventhandlers.Handler handler : Main.eventHandlers){
+                handler.handle(event);
+                if (event.cancel) return true;
+            }
+            c.backendConnection.writePacketServer(event.originatingPacket);
             return true;
         }
         if (p instanceof InvalidPacket packet ){

@@ -2,15 +2,12 @@ package ca.soccer1992.lavaproxy.packets.handlers;
 
 import ca.soccer1992.lavaproxy.Connection;
 import ca.soccer1992.lavaproxy.Main;
+import ca.soccer1992.lavaproxy.eventhandlers.PluginMessageEvent;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.clientserver.*;
 import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-
-
-import static ca.soccer1992.lavaproxy.utils.PacketHelpers.*;
+import ca.soccer1992.lavaproxy.types.Identifier;
 
 public class ConfigHandler extends Handler{
 
@@ -59,15 +56,19 @@ public class ConfigHandler extends Handler{
             return true;
         }
         if (p instanceof PluginMessage packet){
-            ByteBuf dataBuf = Unpooled.copiedBuffer(packet.data);
-            if (packet.channel.equals("minecraft:brand")){
-                c.plr.setBrand(readString(dataBuf));
-                System.out.println(c.fillPlaceholders("log.brand", "", c.plr.brand));
-                //System.out.printf("%s brand: %s%n",c.plr, c.plr.brand);
+            PluginMessageEvent event = new PluginMessageEvent();
+            event.channel = Identifier.read(packet.channel);
+            event.fromBackend = false;
+            event.data = packet.data;
+            event.originatingPacket = packet;
+            event.cancel = false;
+            event.player = c.plr;
+            for (ca.soccer1992.lavaproxy.eventhandlers.Handler handler : Main.eventHandlers){
+                handler.handle(event);
+                if (event.cancel) return true;
             }
-            dataBuf.release();
             if (c.backendConnection == null) return true;
-            if (c.backendConnection.conType == ConnectionTypes.CONFIG) c.backendConnection.writePacket(packet);
+            if (c.backendConnection.conType == ConnectionTypes.CONFIG) c.backendConnection.writePacketServer(event.originatingPacket);
 
             return true;
         }

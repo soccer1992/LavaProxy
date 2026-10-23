@@ -3,6 +3,7 @@ package ca.soccer1992.lavaproxy.packets.handlers.client;
 import ca.soccer1992.lavaproxy.Connection;
 import ca.soccer1992.lavaproxy.Main;
 import ca.soccer1992.lavaproxy.MinecraftVersions;
+import ca.soccer1992.lavaproxy.eventhandlers.PluginMessageEvent;
 import ca.soccer1992.lavaproxy.packets.InvalidPacket;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.NBTKick;
@@ -12,8 +13,10 @@ import ca.soccer1992.lavaproxy.packets.clientserver.EnterConfiguration;
 import ca.soccer1992.lavaproxy.packets.clientserver.KeepAlive;
 import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.handlers.Handler;
+import ca.soccer1992.lavaproxy.types.Identifier;
 import net.kyori.adventure.text.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.fromJSON;
@@ -53,10 +56,14 @@ public class PlayHandler extends Handler {
             //c._dimInfo = c._dimensionCodec.getCompoundTag(packet.dimension);
             //System.out.println(c._dimInfo);
             //c.backendConnection.backendDisconnect(ComponentUtils.parser.deserialize("<rainbow>Simulation distance: " + packet.simDist + "</rainbow><br>" + c._dimensionName));
+            if (c.backendConnection.connectedServer.bungeecordChannel){
+                byte[] registerBytes = "bungeecord:main".getBytes(StandardCharsets.US_ASCII);
+                c.plr.sendPluginMessage(Identifier.read("minecraft:register"), registerBytes);
+            }
             return true;
         }
         if (p instanceof EnterConfiguration){
-            c.backendConnection.writePacketServer(p);
+            c.backendConnection.writePacket(p);
 
             return true;
         }
@@ -65,7 +72,20 @@ public class PlayHandler extends Handler {
             return true;
         }
         if (p instanceof PluginMessage packet) {
-            c.backendConnection.writePacket(packet);
+            PluginMessageEvent event = new PluginMessageEvent();
+            event.channel = Identifier.read(packet.channel);
+            event.fromBackend = true;
+            event.data = packet.data;
+            event.originatingPacket = packet;
+            event.cancel = false;
+            event.player = c.plr;
+            System.out.println("backend playhandler: " + event.channel);
+
+            for (ca.soccer1992.lavaproxy.eventhandlers.Handler handler : Main.eventHandlers){
+                handler.handle(event);
+                if (event.cancel) return true;
+            }
+            c.backendConnection.writePacket(event.originatingPacket);
             return true;
         }
         if (p instanceof SystemChat packet){

@@ -1,6 +1,8 @@
 package ca.soccer1992.lavaproxy.packets.handlers.client;
 
 import ca.soccer1992.lavaproxy.Connection;
+import ca.soccer1992.lavaproxy.Main;
+import ca.soccer1992.lavaproxy.eventhandlers.PluginMessageEvent;
 import ca.soccer1992.lavaproxy.packets.ConnectionTypes;
 import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.NBTKick;
@@ -15,8 +17,6 @@ import ca.soccer1992.lavaproxy.packets.handlers.Handler;
 import ca.soccer1992.lavaproxy.packets.server.FeatureFlags;
 import ca.soccer1992.lavaproxy.types.Identifier;
 import ca.soccer1992.lavaproxy.types.RegistryPart;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 
@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.fromJSON;
-import static ca.soccer1992.lavaproxy.utils.PacketHelpers.readString;
-import static ca.soccer1992.lavaproxy.utils.PacketHelpers.writeString;
 
 public class ConfigHandler extends Handler {
     public boolean handle(Packet p, Connection c){
@@ -98,23 +96,18 @@ public class ConfigHandler extends Handler {
             return true;
         }
         if (p instanceof final PluginMessage packet) {
-            ByteBuf dataBuf = Unpooled.copiedBuffer(packet.data);
-
-            if (packet.channel.equalsIgnoreCase("minecraft:brand")){
-                // rewrite
-                PluginMessage rewrite = new PluginMessage();
-                String rewritten = readString(dataBuf);
-                rewritten = backendConnection.fillPlaceholders("backend.brand","",backendConnection.plr.brand, "", 0, rewritten);
-                ByteBuf buf = Unpooled.buffer();
-                writeString(rewritten, buf);
-                byte[] out = new byte[buf.readableBytes()];
-                buf.readBytes(out);
-                rewrite.setChannel(packet.channel);
-                rewrite.setData(out);
-                backendConnection.writePacket(rewrite);
-                buf.release();
+            PluginMessageEvent event = new PluginMessageEvent();
+            event.channel = Identifier.read(packet.channel);
+            event.fromBackend = true;
+            event.data = packet.data;
+            event.originatingPacket = packet;
+            event.cancel = false;
+            event.player = c.plr;
+            for (ca.soccer1992.lavaproxy.eventhandlers.Handler handler : Main.eventHandlers){
+                handler.handle(event);
+                if (event.cancel) return true;
             }
-            dataBuf.release();
+            c.backendConnection.writePacket(event.originatingPacket);
             return true;
         }
 

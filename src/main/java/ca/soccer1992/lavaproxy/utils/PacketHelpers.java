@@ -5,6 +5,7 @@ import ca.soccer1992.lavaproxy.types.GameProperty;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import net.kyori.adventure.nbt.BinaryTag;
@@ -140,6 +141,34 @@ public class PacketHelpers {
     public static void writeByteArray(ByteBuf buf, byte[] bytes){
         writeVarInt(bytes.length, buf);
         buf.writeBytes(bytes); // come on it doesn't get simpler than that
+    }
+    public static String readUTF(ByteBuf buf) {
+        int length = buf.readUnsignedShort();
+
+        byte[] data = new byte[length + 2];
+        data[0] = (byte) (length >>> 8);
+        data[1] = (byte) length;
+        buf.readBytes(data, 2, length);
+
+        try {
+            return new DataInputStream(
+                    new ByteArrayInputStream(data)
+            ).readUTF();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void writeUTF(String value, ByteBuf buf) {
+        ByteBuf temp = Unpooled.buffer();
+        try {
+            ByteBufOutputStream stream = new ByteBufOutputStream(temp);
+            new DataOutputStream(stream).writeUTF(value);
+            buf.writeBytes(temp);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            temp.release();
+        }
     }
     public static BinaryTag readTag(ByteBuf buf, MinecraftVersions ver){
         BinaryTagType<? extends BinaryTag> type = BINARY_TAG_TYPES[buf.readByte()];

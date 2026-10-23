@@ -1,5 +1,7 @@
 package ca.soccer1992.lavaproxy;
 import ca.soccer1992.lavaproxy.commands.ServerCommand;
+import ca.soccer1992.lavaproxy.eventhandlers.Handler;
+import ca.soccer1992.lavaproxy.eventhandlers.PlayerEventHandler;
 import ca.soccer1992.lavaproxy.types.ServerDefinition;
 import ca.soccer1992.lavaproxy.utils.EncryptionUtils;
 import com.moandjiezana.toml.Toml;
@@ -17,6 +19,7 @@ import java.nio.file.NoSuchFileException;
 import java.security.KeyPair;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 public class Main {
@@ -55,10 +58,21 @@ public class Main {
     public static boolean incomingForwardOptional;
 
     public static String serverIcon = "";
-
+    public static ArrayList<Handler> eventHandlers = new ArrayList<>();
     public static UUID session_id = UUID.randomUUID(); // whoever made this at mojang needs to be fired, WHY DO I HAVE TO DO THIS
+    public static boolean enableBungeeCord;
+
     public static CommandNode getCommand(String cmd){
         return dispatcher.getRoot().getChild(cmd);
+    }
+    public static Player getPlayerFromName(String username){
+        for(Player a:players.values())if(a.name.equalsIgnoreCase(username))return a;
+        return null;
+    }
+    public static ArrayList<Player> getPlayersOnServer(String server){
+        return players.values().stream()
+                .filter(player -> server.equalsIgnoreCase(player.con.connectedServer.name))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     public static int loadConfig() throws IOException {
         servers.clear();
@@ -102,6 +116,7 @@ public class Main {
         trys = toml.getList("tries").toArray(new String[0]);
         forwardType = serverSettings.getString("forward-mode", "").toLowerCase();
         forwardKey = serverSettings.getString("forward-key", "");
+        enableBungeeCord = serverSettings.getBoolean("bungeecord-channel");
         defaultPermissions = serverSettings.getList("permissions").toArray(new String[0]);
 
         switch (forwardType){
@@ -172,6 +187,7 @@ incoming-forwarding-required = true
                 definition.forwardType = override.getString("forward-mode", forwardType);
                 definition.defaultPermissions = override.getList("permissions", Arrays.asList(defaultPermissions))
                         .toArray(new String[0]);
+                definition.bungeecordChannel = override.getBoolean("bungeecord-channel");
             }
             servers.put(i.toLowerCase(), definition);
         }
@@ -218,7 +234,7 @@ incoming-forwarding-required = true
         int port = loadConfig();
         encryptionKey = EncryptionUtils.createRsaPair(keySize);
         dispatcher.register(ServerCommand.create());
-
+        eventHandlers.addFirst(new PlayerEventHandler());
         new NettyServer(port).start();
 
     }

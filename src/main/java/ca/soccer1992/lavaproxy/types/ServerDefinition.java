@@ -9,6 +9,7 @@ public class ServerDefinition {
   public String forwardType;
   public String forwardKey;
   public String[] defaultPermissions;
+  public boolean bungeecordChannel;
   public ServerDefinition(String name, String host, int port){
     this.host = host;
     this.port = port;
@@ -16,5 +17,6 @@ public class ServerDefinition {
     this.forwardType = Main.forwardType;
     this.forwardKey = Main.forwardKey;
     this.defaultPermissions = Main.defaultPermissions;
+    this.bungeecordChannel = Main.enableBungeeCord;
   }
 }

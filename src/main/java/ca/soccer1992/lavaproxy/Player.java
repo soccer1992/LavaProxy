@@ -5,8 +5,10 @@ import ca.soccer1992.lavaproxy.packets.Packet;
 import ca.soccer1992.lavaproxy.packets.client.UnsignedChat;
 import ca.soccer1992.lavaproxy.packets.client.play.SystemChat;
 import ca.soccer1992.lavaproxy.packets.clientserver.EnterConfiguration;
+import ca.soccer1992.lavaproxy.packets.clientserver.PluginMessage;
 import ca.soccer1992.lavaproxy.packets.server.ClientInfo;
 import ca.soccer1992.lavaproxy.types.GameProperty;
+import ca.soccer1992.lavaproxy.types.Identifier;
 import ca.soccer1992.lavaproxy.types.KnownPack;
 import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 import com.mojang.brigadier.ParseResults;
@@ -48,7 +50,7 @@ public class Player implements CommandSender {
             return;
         }
 
-        con.waitingServer = Main.servers.get(server);
+        con.waitingServer = Main.servers.get(server.toLowerCase());
         Connection backend = con.backendConnection;
 
         con.nChannel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(a -> {
@@ -117,12 +119,23 @@ public class Player implements CommandSender {
         this.brand = brand;
 
     }
+    public String getName(){ return name; }
     public void setName(String name){
         this.name = name;
     }
     public Player(Connection c){
         this.con = c;
 
+    }
+    public void sendPluginMessage(Identifier identifier, byte[] data){
+        PluginMessage msg = new PluginMessage();
+        msg.setChannel(identifier.toString());
+        msg.setData(data);
+        if (con.isBackend){
+            con.writePacketServer(msg);
+        } else {
+            con.writePacket(msg);
+        }
     }
     public String toString(){
         if (name != null) {
