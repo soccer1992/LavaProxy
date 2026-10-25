@@ -187,7 +187,7 @@ incoming-forwarding-required = true
                 definition.forwardType = override.getString("forward-mode", forwardType);
                 definition.defaultPermissions = override.getList("permissions", Arrays.asList(defaultPermissions))
                         .toArray(new String[0]);
-                definition.bungeecordChannel = override.getBoolean("bungeecord-channel");
+                definition.bungeecordChannel = override.getBoolean("bungeecord-channel", enableBungeeCord);
             }
             servers.put(i.toLowerCase(), definition);
         }
