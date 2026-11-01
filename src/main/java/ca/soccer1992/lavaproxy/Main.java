@@ -1,5 +1,5 @@
 package ca.soccer1992.lavaproxy;
-import ca.soccer1992.lavaproxy.commands.ServerCommand;
+import ca.soccer1992.lavaproxy.commands.*;
 import ca.soccer1992.lavaproxy.eventhandlers.Handler;
 import ca.soccer1992.lavaproxy.eventhandlers.PlayerEventHandler;
 import ca.soccer1992.lavaproxy.types.ServerDefinition;
