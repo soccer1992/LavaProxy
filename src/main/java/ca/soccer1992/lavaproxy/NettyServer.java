@@ -16,7 +16,6 @@ public class NettyServer {
     public void stop() {
         if (serverChannel != null) {
             serverChannel.close();
-            serverChannel = null;
         }
     }
     public void start() throws Exception {
