@@ -259,7 +259,7 @@ incoming-forwarding-required = true
                     //    server.stop();
                     //    return;
                     //}
-                    console.executeCommand(command);
+                    Main.console.executeCommand(command);
                     
                 }
             } catch (IOException ignored) {
