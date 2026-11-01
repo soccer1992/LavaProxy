@@ -27,14 +27,14 @@ public class EncryptionRequest extends Packet {
         setServerID(readString(buf));
         setPublicKey(readByteArray(buf));
         setVerifyToken(readByteArray(buf));
-        setAuthenticate(!proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2) || buf.readBoolean());
+        setAuthenticate(!proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_5) || buf.readBoolean());
 
     }
     public void encode(ByteBuf buf, MinecraftVersions proto){
         writeString(serverID, buf);
         writeByteArray(buf, publicKey);
         writeByteArray(buf, verifyToken);
-        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_2)) buf.writeBoolean(authenticate);
+        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_20_5)) buf.writeBoolean(authenticate);
     }
 
 }

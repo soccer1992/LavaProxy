@@ -59,7 +59,8 @@ public enum MinecraftVersions {
     MINECRAFT_1_21_9(773, "1.21.9", "1.21.10"),
     MINECRAFT_1_21_11(774, "1.21.11"),
     MINECRAFT_26_1(775, "26.1", "26.1.1", "26.1.2"),
-    MINECRAFT_26_2(776, "26.2");
+    MINECRAFT_26_2(776, "26.2"),
+    MINECRAFT_26_3(777, "26.3");
     public static final Map<Integer, MinecraftVersions> ID_TO_PROTOCOL_CONSTANT;
 
     static {

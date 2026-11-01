@@ -11,9 +11,12 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.security.KeyPair;
@@ -116,7 +119,7 @@ public class Main {
         trys = toml.getList("tries").toArray(new String[0]);
         forwardType = serverSettings.getString("forward-mode", "").toLowerCase();
         forwardKey = serverSettings.getString("forward-key", "");
-        enableBungeeCord = serverSettings.getBoolean("bungeecord-channel");
+        enableBungeeCord = serverSettings.getBoolean("bungeecord-channel", true); // configs from before this option have no key
         defaultPermissions = serverSettings.getList("permissions").toArray(new String[0]);
 
         switch (forwardType){
@@ -235,7 +238,29 @@ incoming-forwarding-required = true
         encryptionKey = EncryptionUtils.createRsaPair(keySize);
         dispatcher.register(ServerCommand.create());
         eventHandlers.addFirst(new PlayerEventHandler());
-        new NettyServer(port).start();
+        NettyServer server = new NettyServer(port);
+        listenForStop(server);
+        server.start();
 
+    }
+    // Hosting panels stop a server by typing a command into its console: "end" for Velocity, "stop" for most others.
+    private static void listenForStop(NettyServer server) {
+        Thread console = new Thread(() -> {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    String command = line.trim();
+                    if (command.equalsIgnoreCase("end") || command.equalsIgnoreCase("stop")) {
+                        System.out.println("Shutting down...");
+                        server.stop();
+                        return;
+                    }
+                }
+            } catch (IOException ignored) {
+                // no console attached
+            }
+        }, "console");
+        console.setDaemon(true);
+        console.start();
     }
 }

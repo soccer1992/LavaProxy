@@ -31,7 +31,7 @@ public class LoginSuccess extends Packet {
         // 1.8
         UUID uuid;
         String username;
-        if (proto.getProtocol()<MinecraftVersions.MINECRAFT_26_1.getProtocol()) {
+        if (proto.getProtocol()<MinecraftVersions.MINECRAFT_26_2.getProtocol()) {
 
             if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_16.getProtocol()) {
                 uuid = (UUID.fromString(readString(buf)));
@@ -45,8 +45,8 @@ public class LoginSuccess extends Packet {
                     proto.isGreaterEquals(MinecraftVersions.MINECRAFT_1_19) ? PacketHelpers.readPropertyArray(buf, proto) : null
             ));
             if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_20_5.getProtocol()) return;
-            // 1.20.6 strict error handle to 1.21.4
-            if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_21_4.getProtocol()) {
+            // strict error handling: 1.20.5 to 1.21.1
+            if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_21_2.getProtocol()) {
                 buf.readBoolean();
             }
         } else {
@@ -59,7 +59,7 @@ public class LoginSuccess extends Packet {
 
     }
     public void encode(ByteBuf buf, MinecraftVersions proto){
-        if (proto.getProtocol()<MinecraftVersions.MINECRAFT_26_1.getProtocol()) {
+        if (proto.getProtocol()<MinecraftVersions.MINECRAFT_26_2.getProtocol()) {
             if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_16.getProtocol()) {
                 writeString(profile.uuid.toString(), buf);
             } else {
@@ -70,9 +70,9 @@ public class LoginSuccess extends Packet {
                 writePropertyArray(buf, proto, profile.properties);
             }
             if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_20_5.getProtocol()) return;
-            // 1.20.6 strict error handle to 1.21.4
+            // strict error handling: 1.20.5 to 1.21.1
 
-            if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_21_4.getProtocol()) {
+            if (proto.getProtocol() < MinecraftVersions.MINECRAFT_1_21_2.getProtocol()) {
                 buf.writeBoolean(false);
             }
         } else {

@@ -154,7 +154,8 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x73),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x72),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x77),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x79)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x79),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_3, 0x7C)
 
             ),
             EnterConfiguration.class, List.of(
@@ -164,7 +165,8 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x70),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x6F),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x74),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x76)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x76),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_3, 0x78)
 
             ),
 
@@ -205,7 +207,8 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x2C),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x2B),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x30),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x31)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x31),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_3, 0x32)
 
             ),
             BundleDelimiter.class, List.of(
@@ -229,7 +232,8 @@ public class PlayReader extends Reader {
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_2, 0x27),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_5, 0x26),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_21_9, 0x2B),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x2C)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_1, 0x2C),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_3, 0x2D)
             )
             //Respawn.class, List.of(
             //        new DefinitionPair(MinecraftVersions.MINECRAFT_1_7_2, 0x07),

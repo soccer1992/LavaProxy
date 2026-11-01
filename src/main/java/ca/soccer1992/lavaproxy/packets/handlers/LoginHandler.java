@@ -115,6 +115,10 @@ public class LoginHandler extends Handler{
         //    c.disconnect("<1.20.2 is currently not supported, sorry!", false);
         //    return true;
         //}
+        // Compression goes on after encryption, right before login success, like vanilla does.
+        // Velocity can't turn encryption on once compression is on, so the other order breaks
+        // LavaProxy behind a Velocity that answers its encryption request.
+        if (Main.compressionThreshold>=0) c.sendCompression(Main.compressionThreshold);
         c.writePacket(success);
         if (c.protocol.getProtocol()< MinecraftVersions.MINECRAFT_1_20_2.getProtocol()){
             // instantly change it xd
@@ -143,7 +147,6 @@ public class LoginHandler extends Handler{
                c.plr.setName(packet.playerName);
                if (!c.receivedForwarding) c.plr.setUUID(packet.uuid);
             }
-            if (Main.compressionThreshold>=0) c.sendCompression(Main.compressionThreshold);
 
             System.out.println(c.fillPlaceholders("log.connect", "", ""));
             if (Main.onlineMode){
