@@ -35,7 +35,7 @@ public class Main {
     public static String[] sessionServers = null;
 
     public static final HashMap<String, String> translations = new HashMap<>();
-    public static LavaDispatcher<CommandSender> dispatcher = new LavaDispatcher<>();
+    public static LavaDispatcher dispatcher = new LavaDispatcher();
     public static final EventLoopGroup nettyGroup = new NioEventLoopGroup();
     public static final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
     public static String motd;
