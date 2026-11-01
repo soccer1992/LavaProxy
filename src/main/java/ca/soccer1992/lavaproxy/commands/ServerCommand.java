@@ -17,7 +17,7 @@ import static ca.soccer1992.lavaproxy.utils.ComponentUtils.parser;
 
 public final class ServerCommand implements Command {
 
-  private ServerCommand() {}
+ ServerCommand() {}
 
   public LiteralArgumentBuilder<CommandSender> create() {
     return LiteralArgumentBuilder.<CommandSender>literal("server")
