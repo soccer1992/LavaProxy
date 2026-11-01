@@ -15,7 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 import static ca.soccer1992.lavaproxy.utils.ComponentUtils.parser;
 
-public final class ServerCommand {
+public final class ServerCommand implements Command {
 
   private ServerCommand() {}
 
@@ -26,7 +26,9 @@ public final class ServerCommand {
             .then(RequiredArgumentBuilder.<CommandSender, String>argument("server", StringArgumentType.word())
                     .executes(ServerCommand::transfer));
   }
-
+  public static String[] aliases(){
+    return new String[]{};
+  }
   private static int usage(CommandContext<CommandSender> ctx) {
     CommandSender sender = ctx.getSource();
     if (!(sender instanceof Player plr)){
