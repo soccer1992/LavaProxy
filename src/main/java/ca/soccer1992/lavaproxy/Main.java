@@ -65,6 +65,7 @@ public class Main {
     public static UUID session_id = UUID.randomUUID(); // whoever made this at mojang needs to be fired, WHY DO I HAVE TO DO THIS
     public static boolean enableBungeeCord;
     public static ConsoleSender console = new ConsoleSender();
+    public static NettyServer server;
     public static CommandNode getCommand(String cmd){
         return dispatcher.getRoot().getChild(cmd);
     }
@@ -239,7 +240,7 @@ incoming-forwarding-required = true
         encryptionKey = EncryptionUtils.createRsaPair(keySize);
         dispatcher.register(ServerCommand.create());
         eventHandlers.addFirst(new PlayerEventHandler());
-        NettyServer server = new NettyServer(port);
+        server = new NettyServer(port);
         listenForStop(server);
         server.start();
 
