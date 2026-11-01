@@ -22,10 +22,10 @@ public final class EndCommand implements Command {
   public static LiteralArgumentBuilder<CommandSender> create() {
     return LiteralArgumentBuilder.<CommandSender>literal("end")
             .requires(sender -> sender.hasPermission("lavaproxy.command.end"))
-            .executes(EndCommand::usage)
+            .executes(EndCommand::usage);
   }
   public static String[] aliases(){
-    return new String[]{"shutdown"}
+    return new String[]{"shutdown"};
   }
   private static int usage(CommandContext<CommandSender> ctx) {
     CommandSender sender = ctx.getSource();
