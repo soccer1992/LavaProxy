@@ -19,14 +19,14 @@ public final class ServerCommand implements Command {
 
   private ServerCommand() {}
 
-  public static LiteralArgumentBuilder<CommandSender> create() {
+  public LiteralArgumentBuilder<CommandSender> create() {
     return LiteralArgumentBuilder.<CommandSender>literal("server")
             .requires(sender -> sender.hasPermission("lavaproxy.command.server"))
             .executes(ServerCommand::usage)
             .then(RequiredArgumentBuilder.<CommandSender, String>argument("server", StringArgumentType.word())
                     .executes(ServerCommand::transfer));
   }
-  public static String[] aliases(){
+  public String[] aliases(){
     return new String[]{};
   }
   private static int usage(CommandContext<CommandSender> ctx) {
