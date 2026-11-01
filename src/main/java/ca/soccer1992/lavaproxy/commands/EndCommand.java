@@ -29,7 +29,7 @@ public final class EndCommand implements Command {
   }
   private static int usage(CommandContext<CommandSender> ctx) {
     CommandSender sender = ctx.getSource();
-    System.out.println(ComponentUtils.plain(parser.deserialize(plr.con.fillPlaceholders("proxy.shutdown", "", ""))), false);
+    System.out.println(ansi.serialize(parser.deserialize("Shutting down")), false);
     Main.server.stop();
     return 1;
   }
