@@ -1,4 +1,4 @@
-package ca.soccer1992.lavaproxy;
+package ca.soccer1992.lavaproxy.commands;
 
 // 1. Missing imports added here:
 import com.mojang.brigadier.CommandDispatcher;
