@@ -35,7 +35,7 @@ public class Main {
     public static String[] sessionServers = null;
 
     public static final HashMap<String, String> translations = new HashMap<>();
-    public static CommandDispatcher<CommandSender> dispatcher = new CommandDispatcher<>();
+    public static LavaDispatcher<CommandSender> dispatcher = new LavaDispatcher<>();
     public static final EventLoopGroup nettyGroup = new NioEventLoopGroup();
     public static final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
     public static String motd;
@@ -238,7 +238,9 @@ incoming-forwarding-required = true
         System.out.println("Loading configuration");
         int port = loadConfig();
         encryptionKey = EncryptionUtils.createRsaPair(keySize);
-        dispatcher.register(ServerCommand.create());
+        dispatcher.register(new ServerCommand());
+        dispatcher.register(new EndCommand());
+
         eventHandlers.addFirst(new PlayerEventHandler());
         server = new NettyServer(port);
         listenForStop(server);
