@@ -17,7 +17,7 @@ import static ca.soccer1992.lavaproxy.utils.ComponentUtils.parser;
 
 public final class EndCommand implements Command {
 
-  EndCommand() {}
+  public EndCommand() {}
 
   public LiteralArgumentBuilder<CommandSender> create() {
     return LiteralArgumentBuilder.<CommandSender>literal("end")
