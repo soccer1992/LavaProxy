@@ -17,14 +17,14 @@ import static ca.soccer1992.lavaproxy.utils.ComponentUtils.parser;
 
 public final class EndCommand implements Command {
 
-  private EndCommand() {}
+  EndCommand() {}
 
-  public static LiteralArgumentBuilder<CommandSender> create() {
+  public LiteralArgumentBuilder<CommandSender> create() {
     return LiteralArgumentBuilder.<CommandSender>literal("end")
             .requires(sender -> sender.hasPermission("lavaproxy.command.end"))
             .executes(EndCommand::usage);
   }
-  public static String[] aliases(){
+  public String[] aliases(){
     return new String[]{"shutdown"};
   }
   private static int usage(CommandContext<CommandSender> ctx) {
