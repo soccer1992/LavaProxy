@@ -29,7 +29,7 @@ public final class EndCommand implements Command {
   }
   private static int usage(CommandContext<CommandSender> ctx) {
     CommandSender sender = ctx.getSource();
-    System.out.println(ComponentUtils.ansi.serialize(parser.deserialize("Shutting down")), false);
+    System.out.println(ComponentUtils.ansi.serialize(parser.deserialize("Shutting down")));
     Main.server.stop();
     return 1;
   }
