@@ -64,7 +64,7 @@ public class Main {
     public static ArrayList<Handler> eventHandlers = new ArrayList<>();
     public static UUID session_id = UUID.randomUUID(); // whoever made this at mojang needs to be fired, WHY DO I HAVE TO DO THIS
     public static boolean enableBungeeCord;
-
+    public static ConsoleSender console = new ConsoleSender();
     public static CommandNode getCommand(String cmd){
         return dispatcher.getRoot().getChild(cmd);
     }
@@ -227,6 +227,7 @@ incoming-forwarding-required = true
         translations.put("command.server.default_msg","<yellow>You are currently connected to {serverName}</yellow>");
         translations.put("command.server.too_many","<red>There are too many servers to list.</red>");
         translations.put("command.noPermission","<red>You do not have permission to run this command.</red>");
+        translations.put("proxy.shutdown","Shutting down");
 
         //System.out.println(root.value.values());
         //root = new CompoundTag("root");
@@ -250,11 +251,13 @@ incoming-forwarding-required = true
                 String line;
                 while ((line = in.readLine()) != null) {
                     String command = line.trim();
-                    if (command.equalsIgnoreCase("end") || command.equalsIgnoreCase("stop")) {
-                        System.out.println("Shutting down...");
-                        server.stop();
-                        return;
-                    }
+                    //if (command.equalsIgnoreCase("end") || command.equalsIgnoreCase("stop")) {
+                    //    System.out.println("Shutting down...");
+                    //    server.stop();
+                    //    return;
+                    //}
+                    console.executeCommand(command)
+                    
                 }
             } catch (IOException ignored) {
                 // no console attached
