@@ -1,5 +1,5 @@
 package ca.soccer1992.lavaproxy;
-import ca.soccer1992.lavaproxy.commands.ServerCommand;
+import ca.soccer1992.lavaproxy.commands.*;
 import ca.soccer1992.lavaproxy.eventhandlers.Handler;
 import ca.soccer1992.lavaproxy.eventhandlers.PlayerEventHandler;
 import ca.soccer1992.lavaproxy.types.ServerDefinition;
@@ -11,9 +11,12 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.security.KeyPair;
@@ -32,7 +35,7 @@ public class Main {
     public static String[] sessionServers = null;
 
     public static final HashMap<String, String> translations = new HashMap<>();
-    public static CommandDispatcher<CommandSender> dispatcher = new CommandDispatcher<>();
+    public static LavaDispatcher dispatcher = new LavaDispatcher();
     public static final EventLoopGroup nettyGroup = new NioEventLoopGroup();
     public static final EventLoopGroup bossGroup = new NioEventLoopGroup(4);
     public static String motd;
@@ -61,7 +64,8 @@ public class Main {
     public static ArrayList<Handler> eventHandlers = new ArrayList<>();
     public static UUID session_id = UUID.randomUUID(); // whoever made this at mojang needs to be fired, WHY DO I HAVE TO DO THIS
     public static boolean enableBungeeCord;
-
+    public static ConsoleSender console = new ConsoleSender();
+    public static NettyServer server;
     public static CommandNode getCommand(String cmd){
         return dispatcher.getRoot().getChild(cmd);
     }
@@ -116,7 +120,7 @@ public class Main {
         trys = toml.getList("tries").toArray(new String[0]);
         forwardType = serverSettings.getString("forward-mode", "").toLowerCase();
         forwardKey = serverSettings.getString("forward-key", "");
-        enableBungeeCord = serverSettings.getBoolean("bungeecord-channel");
+        enableBungeeCord = serverSettings.getBoolean("bungeecord-channel", true); // configs from before this option have no key
         defaultPermissions = serverSettings.getList("permissions").toArray(new String[0]);
 
         switch (forwardType){
@@ -224,6 +228,7 @@ incoming-forwarding-required = true
         translations.put("command.server.default_msg","<yellow>You are currently connected to {serverName}</yellow>");
         translations.put("command.server.too_many","<red>There are too many servers to list.</red>");
         translations.put("command.noPermission","<red>You do not have permission to run this command.</red>");
+        translations.put("proxy.shutdown","Shutting down");
 
         //System.out.println(root.value.values());
         //root = new CompoundTag("root");
@@ -233,9 +238,35 @@ incoming-forwarding-required = true
         System.out.println("Loading configuration");
         int port = loadConfig();
         encryptionKey = EncryptionUtils.createRsaPair(keySize);
-        dispatcher.register(ServerCommand.create());
-        eventHandlers.addFirst(new PlayerEventHandler());
-        new NettyServer(port).start();
+        dispatcher.register(new ServerCommand());
+        dispatcher.register(new EndCommand());
 
+        eventHandlers.addFirst(new PlayerEventHandler());
+        server = new NettyServer(port);
+        listenForStop(server);
+        server.start();
+
+    }
+    // Hosting panels stop a server by typing a command into its console: "end" for Velocity, "stop" for most others.
+    private static void listenForStop(NettyServer server) {
+        Thread console = new Thread(() -> {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    String command = line.trim();
+                    //if (command.equalsIgnoreCase("end") || command.equalsIgnoreCase("stop")) {
+                    //    System.out.println("Shutting down...");
+                    //    server.stop();
+                    //    return;
+                    //}
+                    Main.console.executeCommand(command);
+                    
+                }
+            } catch (IOException ignored) {
+                // no console attached
+            }
+        }, "console");
+        console.setDaemon(true);
+        console.start();
     }
 }

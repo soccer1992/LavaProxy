@@ -48,7 +48,8 @@ public class ConfigReader extends Reader {
                     new DefinitionPair( MinecraftVersions.MINECRAFT_1_20_5, 0x04 )
             ),
             Transfer.class, List.of(
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0B)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0B),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_3, 0x0C)
             ),
             FinishConfiguration.class, List.of(
                     new DefinitionPair( MinecraftVersions.MINECRAFT_1_20_2, 0x02 ),
@@ -57,16 +58,19 @@ public class ConfigReader extends Reader {
             FeatureFlags.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x07),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_3, 0x08),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0C)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0C),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_3, 0x0D)
 
             ),
             KnownPacks.class, List.of(
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0E)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0E),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_3, 0x0F)
             ),
             UpdateTags.class, List.of(
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_2, 0x08),
                     new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_3, 0x09),
-                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0D)
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_1_20_5, 0x0D),
+                    new DefinitionPair(MinecraftVersions.MINECRAFT_26_3, 0x0E)
 
 
             ),

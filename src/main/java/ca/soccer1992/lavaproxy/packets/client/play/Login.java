@@ -188,8 +188,13 @@ public class Login extends Packet {
         //buf.readBytes(seedHash);
         //gamemode = buf.readByte();
         //oldGamemode = buf.readByte();
-        buf.writeByte(gamemode);
-        buf.writeByte(oldGamemode);
+        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_26_3)) {
+            writeVarInt(gamemode, buf);
+            writeVarInt(oldGamemode, buf);
+        } else {
+            buf.writeByte(gamemode);
+            buf.writeByte(oldGamemode);
+        }
         buf.writeBoolean(debugWorld);
         buf.writeBoolean(flatWorld);
         buf.writeBoolean(deathPos != null);
@@ -236,8 +241,13 @@ public class Login extends Packet {
         levelName = readString(buf);
         seedHash = new byte[8];
         buf.readBytes(seedHash);
-        gamemode = buf.readByte();
-        oldGamemode = buf.readByte();
+        if (proto.isGreaterEquals(MinecraftVersions.MINECRAFT_26_3)) {
+            gamemode = (byte) readVarInt(buf);
+            oldGamemode = (byte) readVarInt(buf);
+        } else {
+            gamemode = buf.readByte();
+            oldGamemode = buf.readByte();
+        }
         debugWorld = buf.readBoolean();
         flatWorld = buf.readBoolean();
 
