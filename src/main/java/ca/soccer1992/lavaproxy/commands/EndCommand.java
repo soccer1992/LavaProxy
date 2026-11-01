@@ -13,7 +13,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-import static ca.soccer1992.lavaproxy.utils.ComponentUtils.;parser;
+import static ca.soccer1992.lavaproxy.utils.ComponentUtils.parser;
 import ca.soccer1992.lavaproxy.utils.ComponentUtils;
 public final class EndCommand implements Command {
 
