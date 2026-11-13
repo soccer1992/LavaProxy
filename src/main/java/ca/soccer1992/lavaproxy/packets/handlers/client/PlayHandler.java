@@ -46,6 +46,7 @@ public class PlayHandler extends Handler {
                 c.backendConnection.plr.sendMessage(c.backendConnection._recentDisconnectMessage, false);
             }
             c.backendConnection._recentDisconnectMessage = Component.empty();
+            c.backendConnection.plr.permissions.clear();
             for (String permission : c.backendConnection.connectedServer.defaultPermissions){
                 c.backendConnection.plr.permissions.put(permission, true);
             }
@@ -79,7 +80,6 @@ public class PlayHandler extends Handler {
             event.originatingPacket = packet;
             event.cancel = false;
             event.player = c.plr;
-            System.out.println("backend playhandler: " + event.channel);
 
             for (ca.soccer1992.lavaproxy.eventhandlers.Handler handler : Main.eventHandlers){
                 handler.handle(event);

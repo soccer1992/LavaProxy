@@ -261,7 +261,7 @@ public class PacketHelpers {
         }
     }
     public static void writeString(String str, ByteBuf buf) {
-        writeVarInt(str.length(), buf);
+        writeVarInt(str.getBytes().length, buf);
         buf.writeCharSequence(str, StandardCharsets.UTF_8);
 
     }
